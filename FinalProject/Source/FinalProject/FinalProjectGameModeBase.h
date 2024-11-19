@@ -14,4 +14,6 @@ class FINALPROJECT_API AFinalProjectGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	AFinalProjectGameModeBase();
 };

@@ -3,3 +3,6 @@
 
 #include "FinalProjectGameModeBase.h"
 
+AFinalProjectGameModeBase::AFinalProjectGameModeBase()
+{
+}
