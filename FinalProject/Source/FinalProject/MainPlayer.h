@@ -18,14 +18,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UCameraComponent* camera;
 
-
+	bool bControlSpringArmYawOnly; // 디버깅용, Player움직임이 아닌 카메라의 움직임만 제어하고 싶을 때.
 
 public:
-	void MoveVertical(float _v);
+	void MoveVertical(float _v); // 플레이어의 이동 함수들
 	void MoveHorizontal(float _v);
 
-	void MousePitch(float _v);
+	void MousePitch(float _v); // 마우스를 이용한 이동 및 시점 전환 함수들
 	void MouseYaw(float _v);
+
+	void OnControlSpringArmYawOnly() { bControlSpringArmYawOnly = true; }
+	void OffControlSpringArmYawOnly();
+	
 
 protected:
 	virtual void BeginPlay() override;

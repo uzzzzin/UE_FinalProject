@@ -4,6 +4,7 @@
 #include "GameFramework/SpringArmComponent.h"
 
 AMainPlayer::AMainPlayer()
+	: bControlSpringArmYawOnly(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -41,7 +42,6 @@ void AMainPlayer::BeginPlay()
 void AMainPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, FString::Printf(TEXT("(%f, %f, %f)"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z));
 }
 
 void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -54,9 +54,9 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis(TEXT("MousePitch"), this, &AMainPlayer::MousePitch); // 위,아래
 	PlayerInputComponent->BindAxis(TEXT("MouseYaw"), this, &AMainPlayer::MouseYaw); // 좌, 우
 	
-	//PlayerInputComponent->BindAction(TEXT("FixThisMovement"), EInputEvent::IE_Pressed, this, &AMainPlayer::FixMovementFor); // 플레이어 시점 고정 여부
-	//PlayerInputComponent->BindAction(TEXT("FixThisMovement"), EInputEvent::IE_Released, this, &AMainPlayer::FreeMovement); // 좌 Shift
-	// 마우스로 시점 전환할 때 버튼을 누르면 움직임은 마우스 화면을 안 따라가도록 할건데 그걸 키고 끌 함수 추천해줘 키는 거랑 끄는 거랑 분리 좀
+	// 마우스로 시점 전환할 때 LShift 누르면 플레이어의 방향벡터는 마우스 화면을 안 따라가도록 할건데 그걸 키고 끌 변수.
+	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Pressed, this, &AMainPlayer::OnControlSpringArmYawOnly);
+	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Released, this, &AMainPlayer::OffControlSpringArmYawOnly);
 }
 
 void AMainPlayer::MoveVertical(float _v)
@@ -93,6 +93,22 @@ void AMainPlayer::MouseYaw(float _v)
 {
 	if (_v != 0)
 	{
-		this->AddControllerYawInput(_v); // Player의 방향 벡터, SpringArm의 각도 모두 변경.
+		if (true == bControlSpringArmYawOnly) // SpringArm의 각도만 변경.
+		{
+			FRotator armRot = springArm->GetRelativeRotation();
+			armRot.Yaw = FMath::Clamp(armRot.Yaw + _v, armRot.Yaw - 70.f, armRot.Yaw + 70.f);
+			FRotator newRot = FMath::RInterpTo(springArm->GetRelativeRotation(), armRot, GetWorld()->GetDeltaSeconds(), 20.f); // 마지막 인자는 회전 속도
+			springArm->SetRelativeRotation(newRot);
+		}
+		else
+		{
+			this->AddControllerYawInput(_v); // Player의 방향 벡터, SpringArm의 각도 모두 변경.
+		}
 	}
+}
+
+void AMainPlayer::OffControlSpringArmYawOnly()
+{
+	bControlSpringArmYawOnly = false;
+	springArm->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f)); // 다시 기본 SpringArm 값으로 세팅
 }
