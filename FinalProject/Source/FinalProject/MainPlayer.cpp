@@ -21,9 +21,8 @@ AMainPlayer::AMainPlayer()
 	//! Spring Arm Componet 설정
 	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	springArm->SetupAttachment(RootComponent);
-	springArm->TargetArmLength = 500.f;
-	springArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f)); // Ingame -> Yaw = 90.f;
-	//springArm->SetRelativeRotation(FRotator(-10.f, 90.f, 0.f)); // Ingame -> Yaw = 90.f;
+	springArm->TargetArmLength = 600.f;
+	springArm->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
 	springArm->bDoCollisionTest = false; // 충돌 시, 줌인효과 false
 
 	//! Camera Component 설정
@@ -31,7 +30,7 @@ AMainPlayer::AMainPlayer()
 	camera->SetupAttachment(springArm);
 
 
-
+	bUseControllerRotationPitch = true; // 무브먼트 이용해서 Pitch Rotation 가능하도록 설정.
 }
 
 void AMainPlayer::BeginPlay()
@@ -49,16 +48,22 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("MoveHorizontal"), this, &AMainPlayer::MoveHorizontal);
-	PlayerInputComponent->BindAxis(TEXT("MoveVertical"), this, &AMainPlayer::MoveVertical);
+	PlayerInputComponent->BindAxis(TEXT("MoveHorizontal"), this, &AMainPlayer::MoveHorizontal); // A, D 
+	PlayerInputComponent->BindAxis(TEXT("MoveVertical"), this, &AMainPlayer::MoveVertical); // W, S
 
+	PlayerInputComponent->BindAxis(TEXT("MousePitch"), this, &AMainPlayer::MousePitch); // 위,아래
+	PlayerInputComponent->BindAxis(TEXT("MouseYaw"), this, &AMainPlayer::MouseYaw); // 좌, 우
+	
+	//PlayerInputComponent->BindAction(TEXT("FixThisMovement"), EInputEvent::IE_Pressed, this, &AMainPlayer::FixMovementFor); // 플레이어 시점 고정 여부
+	//PlayerInputComponent->BindAction(TEXT("FixThisMovement"), EInputEvent::IE_Released, this, &AMainPlayer::FreeMovement); // 좌 Shift
+	// 마우스로 시점 전환할 때 버튼을 누르면 움직임은 마우스 화면을 안 따라가도록 할건데 그걸 키고 끌 함수 추천해줘 키는 거랑 끄는 거랑 분리 좀
 }
 
 void AMainPlayer::MoveVertical(float _v)
 {
 	if (_v != 0)
 	{
-		this->AddMovementInput(this->GetActorForwardVector(), _v);
+		this->AddMovementInput(this->GetActorForwardVector(), _v); // 앞, 뒤
 	}
 }
 
@@ -66,6 +71,28 @@ void AMainPlayer::MoveHorizontal(float _v)
 {
 	if (_v != 0)
 	{
-		this->AddMovementInput(this->GetActorRightVector(), _v);
+		this->AddMovementInput(this->GetActorRightVector(), _v); // 좌, 우
+	}
+}
+
+void AMainPlayer::MousePitch(float _v)
+{
+	if (_v != 0) // SpringArm의 각도만 변경됨. Player의 방향벡터는 변하지 않음.
+	{
+		FRotator armRot = springArm->GetRelativeRotation();
+		armRot.Pitch = FMath::Clamp(armRot.Pitch + _v, -30.f, 5); // 각도 범위 변경
+		FRotator newRot = FMath::RInterpTo(springArm->GetRelativeRotation(), armRot, GetWorld()->GetDeltaSeconds(), 20.f); // 마지막 인자는 회전 속도
+		springArm->SetRelativeRotation(newRot);
+ 
+		//TODO : 게임에서는 계속 위아래로 움직이면 너무 산만해보일 것 같으니 
+		//TODO : 위,아래 시점 전환 속도도 조금 늦출 필요가 있을 것 같음.
+	}
+}
+
+void AMainPlayer::MouseYaw(float _v)
+{
+	if (_v != 0)
+	{
+		this->AddControllerYawInput(_v); // Player의 방향 벡터, SpringArm의 각도 모두 변경.
 	}
 }

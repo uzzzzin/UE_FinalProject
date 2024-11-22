@@ -24,6 +24,9 @@ public:
 	void MoveVertical(float _v);
 	void MoveHorizontal(float _v);
 
+	void MousePitch(float _v);
+	void MouseYaw(float _v);
+
 protected:
 	virtual void BeginPlay() override;
 
