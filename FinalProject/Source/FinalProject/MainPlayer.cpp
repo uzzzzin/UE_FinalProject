@@ -3,6 +3,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
+#include "MainPlayerAnimInstance.h"
+
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
 {
@@ -30,6 +32,12 @@ AMainPlayer::AMainPlayer()
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("camera"));
 	camera->SetupAttachment(springArm);
 
+	//! Animation Instance 설정
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimBPClass(TEXT("/Script/Engine.AnimBlueprint'/Game/Player/BP_MainPlayerAnimInstance.BP_MainPlayerAnimInstance_C'"));
+	if (AnimBPClass.Class)
+	{
+		AnimInstanceBP = AnimBPClass.Class;
+	}
 
 	bUseControllerRotationPitch = true; // 무브먼트 이용해서 Pitch Rotation 가능하도록 설정.
 }
@@ -37,6 +45,11 @@ AMainPlayer::AMainPlayer()
 void AMainPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (GetMesh())
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstanceBP); // BP AnimInstance 연결
+	}
 }
 
 void AMainPlayer::Tick(float DeltaTime)
@@ -79,13 +92,15 @@ void AMainPlayer::MousePitch(float _v)
 {
 	if (_v != 0) // SpringArm의 각도만 변경됨. Player의 방향벡터는 변하지 않음.
 	{
+		//TODO : 게임에서는 계속 위아래로 움직이면 너무 산만해보일 것 같으니 
+		//TODO : 위,아래 시점 전환 속도도 조금 늦출 필요가 있을 것 같음 !!
 		FRotator armRot = springArm->GetRelativeRotation();
 		armRot.Pitch = FMath::Clamp(armRot.Pitch + _v, -30.f, 5); // 각도 범위 변경
 		FRotator newRot = FMath::RInterpTo(springArm->GetRelativeRotation(), armRot, GetWorld()->GetDeltaSeconds(), 20.f); // 마지막 인자는 회전 속도
 		springArm->SetRelativeRotation(newRot);
- 
-		//TODO : 게임에서는 계속 위아래로 움직이면 너무 산만해보일 것 같으니 
-		//TODO : 위,아래 시점 전환 속도도 조금 늦출 필요가 있을 것 같음.
+
+		// 애니메이션 인스턴스
+		Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->SetMousePitch(_v);
 	}
 }
 
@@ -104,6 +119,7 @@ void AMainPlayer::MouseYaw(float _v)
 		{
 			this->AddControllerYawInput(_v); // Player의 방향 벡터, SpringArm의 각도 모두 변경.
 		}
+		Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->SetMouseYaw(_v);
 	}
 }
 
