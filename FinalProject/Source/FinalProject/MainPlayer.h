@@ -23,12 +23,18 @@ public:
 
 	bool bControlSpringArmYawOnly; // 디버깅용, Player움직임이 아닌 카메라의 움직임만 제어하고 싶을 때.
 
+	UPROPERTY(BlueprintReadOnly, Category = "State")
+	bool bIsMoving; // 지금 이동중이에요, state->move, AnimInstance에서 확인용.
+
 public:
 	void MoveVertical(float _v); // 플레이어의 이동 함수들
 	void MoveHorizontal(float _v);
 
 	void MousePitch(float _v); // 마우스를 이용한 이동 및 시점 전환 함수들
 	void MouseYaw(float _v);
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	bool GetIsMoving() { return bIsMoving; }
 
 	void OnControlSpringArmYawOnly() { bControlSpringArmYawOnly = true; }
 	void OffControlSpringArmYawOnly();

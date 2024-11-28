@@ -2,11 +2,13 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #include "MainPlayerAnimInstance.h"
 
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
+	, bIsMoving(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -55,6 +57,9 @@ void AMainPlayer::BeginPlay()
 void AMainPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	// 캐릭터 이동중인지 확인, AnimInstance에서 State변경 시 사용.
+	bIsMoving = (GetVelocity().Size() > 0.f) && (GetCharacterMovement()->IsMovingOnGround());
 }
 
 void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -77,7 +82,9 @@ void AMainPlayer::MoveVertical(float _v)
 	if (_v != 0)
 	{
 		this->AddMovementInput(this->GetActorForwardVector(), _v); // 앞, 뒤
+		bIsMoving = true; // 키를 누르고 있을 때 속력이 없더라도 움직임 상태로 유지하고 싶음.
 	}
+	Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->SetMoveVertical(_v);
 }
 
 void AMainPlayer::MoveHorizontal(float _v)
@@ -85,7 +92,9 @@ void AMainPlayer::MoveHorizontal(float _v)
 	if (_v != 0)
 	{
 		this->AddMovementInput(this->GetActorRightVector(), _v); // 좌, 우
+		bIsMoving = true; // 키를 누르고 있을 때, 속력이 없더라도 움직임 상태로 유지하고 싶음.
 	}
+	Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->SetMoveHorizontal(_v); // BS-Jog 각도 변경
 }
 
 void AMainPlayer::MousePitch(float _v)
@@ -100,7 +109,7 @@ void AMainPlayer::MousePitch(float _v)
 		springArm->SetRelativeRotation(newRot);
 
 		// 애니메이션 인스턴스
-		Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->SetMousePitch(_v);
+		Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->AddMousePitch(_v);
 	}
 }
 
@@ -119,7 +128,7 @@ void AMainPlayer::MouseYaw(float _v)
 		{
 			this->AddControllerYawInput(_v); // Player의 방향 벡터, SpringArm의 각도 모두 변경.
 		}
-		Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->SetMouseYaw(_v);
+		Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->AddMouseYaw(_v); // BS-InputMouse 각도 변경
 	}
 }
 
