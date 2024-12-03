@@ -26,6 +26,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InputMoveVertical; // ~45, +45, BS 값 조절
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAttackEnded; // (Attack Montage 애니메이션이 실행중이라는 전제), Attack이 아닌 Recovery 상태로 넘어갔을 떄 true
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "InputMouse")
@@ -42,6 +45,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "InputMove")
 	void AddMoveVertical(float _v);
 
+	//! Attack Montage Notify
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_FinishAttack0();
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_FinishAttack1();
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_FinishAttack2();
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_FinishAttack3();
+
+	UFUNCTION()
+	void UpdateComboSettings(); // bAttackEnded 세팅.
+
+	UFUNCTION(BlueprintCallable)
+	bool GetbAttackEnded() { return bAttackEnded; }
+	UFUNCTION(BlueprintCallable)
+	void SetbAttackEnded(bool _b) { bAttackEnded = _b; }
 
 public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

@@ -5,6 +5,7 @@
 
 UMainPlayerAnimInstance::UMainPlayerAnimInstance()
 	: bIsMoving(false)
+	, bAttackEnded(true) // 초기는 바로 공격 가능할 수 있도록 true.
 {
 }
 
@@ -91,5 +92,39 @@ void UMainPlayerAnimInstance::AddMoveVertical(float _v)
 		{
 			InputMoveVertical += _v * 2; // 조금 더 빠른 값 누적을 위한
 		}
+	}
+}
+
+void UMainPlayerAnimInstance::AnimNotify_FinishAttack0()
+{
+	UpdateComboSettings();
+}
+
+void UMainPlayerAnimInstance::AnimNotify_FinishAttack1()
+{
+	UpdateComboSettings();
+}
+
+void UMainPlayerAnimInstance::AnimNotify_FinishAttack2()
+{
+	UpdateComboSettings();
+}
+
+void UMainPlayerAnimInstance::AnimNotify_FinishAttack3()
+{
+	UpdateComboSettings();
+}
+
+void UMainPlayerAnimInstance::UpdateComboSettings()
+{
+	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
+
+	if (true == Owner->GetIsAttacking()) // 공격 상태 -> recovery로 가는 중
+	{
+		bAttackEnded = true; // Attack Montage가 실행중인데 딱 Recovery Noti에 걸림.(아직 recovery 상태가 아닐 때)
+	}
+	else // false == Owner->GetIsAttacking()
+	{
+		bAttackEnded = true;
 	}
 }

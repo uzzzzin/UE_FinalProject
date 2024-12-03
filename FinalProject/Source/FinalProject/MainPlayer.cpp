@@ -9,7 +9,9 @@
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
 	, bIsMoving(false)
-	, AttackAnimNum(0)
+	, AttackComboNum(0)
+	, bIsAttacking(false)
+	, AttackMontagePlayRate(2.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -49,17 +51,13 @@ AMainPlayer::AMainPlayer()
 		AttackMontage = montage.Object;
 	}
 
+	//! 마우스로 제어하는 시야 세팅
 	bUseControllerRotationPitch = true; // 무브먼트 이용해서 Pitch Rotation 가능하도록 설정.
 }
 
 void AMainPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (GetMesh())
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceBP); // BP AnimInstance 연결
-	}
 }
 
 void AMainPlayer::Tick(float DeltaTime)
@@ -84,6 +82,22 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Pressed, this, &AMainPlayer::OnControlSpringArmYawOnly);
 	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Released, this, &AMainPlayer::OffControlSpringArmYawOnly);
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMainPlayer::Attack);
+}
+
+void AMainPlayer::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	
+	 //! BP Animation Instance 연결
+	if (GetMesh())
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstanceBP);
+	}
+
+	//! Attack Montage -> OnMontageEnded (내장)델리게이트 바인딩
+	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	animInst->OnMontageEnded.AddDynamic(this, &AMainPlayer::OnMontageEndedCallback);
 }
 
 void AMainPlayer::MoveVertical(float _v)
@@ -130,7 +144,7 @@ void AMainPlayer::MouseYaw(float _v)
 		{
 			FRotator armRot = springArm->GetRelativeRotation();
 			armRot.Yaw = FMath::Clamp(armRot.Yaw + _v, armRot.Yaw - 70.f, armRot.Yaw + 70.f);
-			FRotator newRot = FMath::RInterpTo(springArm->GetRelativeRotation(), armRot, GetWorld()->GetDeltaSeconds(), 20.f); // 마지막 인자는 회전 속도
+			FRotator newRot = FMath::RInterpTo(springArm->GetRelativeRotation(), armRot, GetWorld()->GetDeltaSeconds(), 40.f); // 마지막 인자는 회전 속도
 			springArm->SetRelativeRotation(newRot);
 		}
 		else
@@ -143,7 +157,7 @@ void AMainPlayer::MouseYaw(float _v)
 
 void AMainPlayer::Attack()
 {
-	GEngine->AddOnScreenDebugMessage(-1,1.f,FColor::Blue, TEXT("AMainPlayer::Attack()"));
+	bIsAttacking = true; // 공격 상태!
 	PlayAttackMontage();
 }
 
@@ -153,30 +167,47 @@ void AMainPlayer::OffControlSpringArmYawOnly()
 	springArm->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f)); // 다시 기본 SpringArm 값으로 세팅
 }
 
-void AMainPlayer::PlayAttackMontage()
+void AMainPlayer::PlayAttackMontage() // Attack 키 눌렸어요
 {
 	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	//! AttackMontage가 실행중이지 않을 때 
-	//! -> 몽타주 Play.
 	
-	//! AttackMontage가 실행중일 때
-	//! == 이미 Attack 상태라 몽타주 Play중.
-	//! == 다시 공격키를 클릭한 상태. (유사 연타)
-	//! -> 현재 진행중인 애니메이션의 진행 속도를 빠르게 해서 빨리 끝냄.
-	//! -> (공격은 씹힌거지)
-	
-	if (!animInst->Montage_IsPlaying(AttackMontage))
+	if (!animInst->Montage_IsPlaying(AttackMontage)) // 공격 애니메이션이 실행중이지 않은 상태.
 	{
-		animInst->Montage_Play(AttackMontage, 1.f);
-		animInst->Montage_JumpToSection(FName(*FString::Printf(TEXT("PoleAttack%d"), AttackAnimNum)), AttackMontage);
-		if (AttackAnimNum >= 3)
-			AttackAnimNum = 0;
-		else
-			AttackAnimNum += 1;
+		if (true == animInst->GetbAttackEnded()) // recovery 상태 혹은 아무 상태가 아님 --> 공격 유효
+		{
+			animInst->Montage_Play(AttackMontage, AttackMontagePlayRate);
+			animInst->SetbAttackEnded(false);
+			// 매번 다른 애니메이션이 실행될 수 있도록.
+			animInst->Montage_JumpToSection(FName(*FString::Printf(TEXT("PoleAttack%d"), AttackComboNum)), AttackMontage);
+			if (AttackComboNum >= 3)
+				AttackComboNum = 0;
+			else
+				AttackComboNum += 1;
+		}
+		// else -> 아무 상태도 아니에요, 들어올 경우가 없는 상태로 예상. (recovery 상태가 아니에요.) --> 공격은 씹혀요.
 	}
-	else
+	else // 공격 애니메이션이 실행중일 때, == 공격 키를 연타해서 함수에 들어온 상태임.
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Blue, TEXT("Speed Up!!!!"));
-		animInst->Montage_SetPlayRate(AttackMontage, 2.5f);
+		if (true == animInst->GetbAttackEnded()) // 지금 현재 애니메이션이 recovery 상태 --> 공격 유효 !
+		{
+			//TODO 애니메이션 실행 속도가 너무 빨라지니 애니메이션이 씹혀요. 주의해서 값 조절.
+			animInst->Montage_SetPlayRate(AttackMontage, AttackMontagePlayRate * 1.3f); // Recovery 애니메이션 속도를 빠르게 해서 얼른 애니메이션이 끝나도록. 
+			animInst->Montage_Play(AttackMontage, AttackMontagePlayRate);
+			animInst->SetbAttackEnded(false);
+			// 매번 다른 애니메이션이 실행될 수 있도록.
+			animInst->Montage_JumpToSection(FName(*FString::Printf(TEXT("PoleAttack%d"), AttackComboNum)), AttackMontage);
+			if (AttackComboNum >= 3)
+				AttackComboNum = 0;
+			else
+				AttackComboNum += 1;
+		}
+		// else // false == animInst->GetbAttackEnded() // 지금 현재 공격 상태 (recovery 상태는 아직 오지 않아따..) --> 공격은 씹혀요.
 	}
+}
+
+void AMainPlayer::OnMontageEndedCallback(UAnimMontage* Montage, bool bInterrupted)
+{
+	//! AttackMontage의 현재 몽타주 섹션이 끝났을 때,
+	//! 공격중인 상태 = false;
+	bIsAttacking = false;
 }
