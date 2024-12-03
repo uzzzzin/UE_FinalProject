@@ -28,7 +28,6 @@ void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			InputMousePitch = 0.f;
 		}
 	}
-	
 }
 
 void UMainPlayerAnimInstance::AddMouseYaw(float _v)
@@ -44,11 +43,10 @@ void UMainPlayerAnimInstance::AddMousePitch(float _v)
 	if (0 != _v)
 	{
 		InputMousePitch += _v; // Input값을 누적시켜서 캐릭터가 보는 각도 조절.
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, FString::Printf(TEXT("Mouse Pitch : %f"), InputMousePitch));
 	}
 }
 
-void UMainPlayerAnimInstance::SetMoveHorizontal(float _v)
+void UMainPlayerAnimInstance::AddMoveHorizontal(float _v)
 {
 	if (0 == _v)// 좌,우 움직임이 없는 상태라면
 	{
@@ -70,10 +68,9 @@ void UMainPlayerAnimInstance::SetMoveHorizontal(float _v)
 			InputMoveHorizontal += _v * 2; // 조금 더 빠른 값 누적을 위한
 		}
 	}
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, FString::Printf(TEXT("InputMoveHorizontal : %f"), InputMoveHorizontal));
 }
 
-void UMainPlayerAnimInstance::SetMoveVertical(float _v)
+void UMainPlayerAnimInstance::AddMoveVertical(float _v)
 {
 	if (0 == _v) // 앞, 뒤 움직임이 없는 상태라면
 	{
@@ -95,5 +92,4 @@ void UMainPlayerAnimInstance::SetMoveVertical(float _v)
 			InputMoveVertical += _v * 2; // 조금 더 빠른 값 누적을 위한
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, FString::Printf(TEXT("InputMoveVertical : %f"), InputMoveVertical));
 }

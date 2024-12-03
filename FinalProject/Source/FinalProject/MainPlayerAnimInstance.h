@@ -38,9 +38,10 @@ public:
 	float GetMousePitch() { return InputMousePitch; }
 
 	UFUNCTION(BlueprintCallable, Category = "InputMove")
-	void SetMoveHorizontal(float _v);
+	void AddMoveHorizontal(float _v);
 	UFUNCTION(BlueprintCallable, Category = "InputMove")
-	void SetMoveVertical(float _v);
+	void AddMoveVertical(float _v);
+
 
 public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

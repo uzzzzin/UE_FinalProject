@@ -9,6 +9,7 @@
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
 	, bIsMoving(false)
+	, AttackAnimNum(0)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -39,6 +40,13 @@ AMainPlayer::AMainPlayer()
 	if (AnimBPClass.Class)
 	{
 		AnimInstanceBP = AnimBPClass.Class;
+	}
+
+	//! Attack Montage 세팅
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> montage(TEXT("/Script/Engine.AnimMontage'/Game/Player/AM_MainPlayer_Attack_Pole.AM_MainPlayer_Attack_Pole'"));
+	if (montage.Succeeded())
+	{
+		AttackMontage = montage.Object;
 	}
 
 	bUseControllerRotationPitch = true; // 무브먼트 이용해서 Pitch Rotation 가능하도록 설정.
@@ -75,6 +83,7 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// 마우스로 시점 전환할 때 LShift 누르면 플레이어의 방향벡터는 마우스 화면을 안 따라가도록 할건데 그걸 키고 끌 변수.
 	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Pressed, this, &AMainPlayer::OnControlSpringArmYawOnly);
 	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Released, this, &AMainPlayer::OffControlSpringArmYawOnly);
+	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMainPlayer::Attack);
 }
 
 void AMainPlayer::MoveVertical(float _v)
@@ -84,7 +93,7 @@ void AMainPlayer::MoveVertical(float _v)
 		this->AddMovementInput(this->GetActorForwardVector(), _v); // 앞, 뒤
 		bIsMoving = true; // 키를 누르고 있을 때 속력이 없더라도 움직임 상태로 유지하고 싶음.
 	}
-	Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->SetMoveVertical(_v);
+	Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->AddMoveVertical(_v);
 }
 
 void AMainPlayer::MoveHorizontal(float _v)
@@ -94,7 +103,7 @@ void AMainPlayer::MoveHorizontal(float _v)
 		this->AddMovementInput(this->GetActorRightVector(), _v); // 좌, 우
 		bIsMoving = true; // 키를 누르고 있을 때, 속력이 없더라도 움직임 상태로 유지하고 싶음.
 	}
-	Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->SetMoveHorizontal(_v); // BS-Jog 각도 변경
+	Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->AddMoveHorizontal(_v); // BS-Jog 각도 변경
 }
 
 void AMainPlayer::MousePitch(float _v)
@@ -132,8 +141,42 @@ void AMainPlayer::MouseYaw(float _v)
 	}
 }
 
+void AMainPlayer::Attack()
+{
+	GEngine->AddOnScreenDebugMessage(-1,1.f,FColor::Blue, TEXT("AMainPlayer::Attack()"));
+	PlayAttackMontage();
+}
+
 void AMainPlayer::OffControlSpringArmYawOnly()
 {
 	bControlSpringArmYawOnly = false;
 	springArm->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f)); // 다시 기본 SpringArm 값으로 세팅
+}
+
+void AMainPlayer::PlayAttackMontage()
+{
+	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	//! AttackMontage가 실행중이지 않을 때 
+	//! -> 몽타주 Play.
+	
+	//! AttackMontage가 실행중일 때
+	//! == 이미 Attack 상태라 몽타주 Play중.
+	//! == 다시 공격키를 클릭한 상태. (유사 연타)
+	//! -> 현재 진행중인 애니메이션의 진행 속도를 빠르게 해서 빨리 끝냄.
+	//! -> (공격은 씹힌거지)
+	
+	if (!animInst->Montage_IsPlaying(AttackMontage))
+	{
+		animInst->Montage_Play(AttackMontage, 1.f);
+		animInst->Montage_JumpToSection(FName(*FString::Printf(TEXT("PoleAttack%d"), AttackAnimNum)), AttackMontage);
+		if (AttackAnimNum >= 3)
+			AttackAnimNum = 0;
+		else
+			AttackAnimNum += 1;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Blue, TEXT("Speed Up!!!!"));
+		animInst->Montage_SetPlayRate(AttackMontage, 2.5f);
+	}
 }
