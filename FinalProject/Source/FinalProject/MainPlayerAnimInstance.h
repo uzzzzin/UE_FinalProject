@@ -18,8 +18,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InputMousePitch;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// 카테고리가 State라면, AnimGraph에서 쓰이는 state 관련 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	bool bIsMoving; // 이동중인가?
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	bool bIsAttacking; // 이동중인가?
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InputMoveHorizontal; // ~45, +45, BS 값 조절

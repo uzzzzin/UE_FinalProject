@@ -5,6 +5,7 @@
 
 UMainPlayerAnimInstance::UMainPlayerAnimInstance()
 	: bIsMoving(false)
+	, bIsAttacking(false)
 	, bAttackEnded(true) // 초기는 바로 공격 가능할 수 있도록 true.
 {
 }
@@ -16,6 +17,8 @@ void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 	if (Owner)
 	{
+		//! BP-> Anim State 세팅
+		bIsAttacking = Owner->GetIsAttacking();
 		bIsMoving = Owner->GetIsMoving();
 
 		if (false == bIsMoving) // State : Move -> Idle 초기 상태 변경
@@ -28,6 +31,7 @@ void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			InputMouseYaw = 0.f;
 			InputMousePitch = 0.f;
 		}
+
 	}
 }
 
