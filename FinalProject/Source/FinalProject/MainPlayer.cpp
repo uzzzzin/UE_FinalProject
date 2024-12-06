@@ -73,32 +73,34 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("MoveHorizontal"), this, &AMainPlayer::MoveHorizontal); // A, D 
-	PlayerInputComponent->BindAxis(TEXT("MoveVertical"), this, &AMainPlayer::MoveVertical); // W, S
-
+	// Player Mouse Input
 	PlayerInputComponent->BindAxis(TEXT("MousePitch"), this, &AMainPlayer::MousePitch); // 위,아래
 	PlayerInputComponent->BindAxis(TEXT("MouseYaw"), this, &AMainPlayer::MouseYaw); // 좌, 우
-	
+
+	// Player Keyboard Input
+	PlayerInputComponent->BindAxis(TEXT("MoveVertical"), this, &AMainPlayer::MoveVertical); // W, S
+	PlayerInputComponent->BindAxis(TEXT("MoveHorizontal"), this, &AMainPlayer::MoveHorizontal); // A, D 
+	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMainPlayer::Attack); // 마우스 좌클릭
+	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMainPlayer::MyJump); // 스페이스바
+
+	// Debug Input
 	// 마우스로 시점 전환할 때 LShift 누르면 플레이어의 방향벡터는 마우스 화면을 안 따라가도록 할건데 그걸 키고 끌 변수.
-	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Pressed, this, &AMainPlayer::OnControlSpringArmYawOnly);
-	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Released, this, &AMainPlayer::OffControlSpringArmYawOnly);
-	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMainPlayer::Attack);
-	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMainPlayer::MyJump);
-	PlayerInputComponent->BindAction(TEXT("DebugCurStateName"), EInputEvent::IE_Pressed, this, &AMainPlayer::DebugCurrentState);
+	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Pressed, this, &AMainPlayer::OnControlSpringArmYawOnly); // LShift
+	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Released, this, &AMainPlayer::OffControlSpringArmYawOnly); // LShift
+	PlayerInputComponent->BindAction(TEXT("DebugCurStateName"), EInputEvent::IE_Pressed, this, &AMainPlayer::DebugCurrentState); // O(not zero)
 }
 
 void AMainPlayer::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	
 	 //! BP Animation Instance 연결
 	if (GetMesh())
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceBP);
 	}
 
-	//! Attack Montage -> OnMontageEnded (내장)델리게이트 바인딩
+	//! Attack Montage -> OnMontageEnded (내장)델리게이트 Binding (몽타주가 끝났을 때)
 	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->OnMontageEnded.AddDynamic(this, &AMainPlayer::OnMontageEndedCallback);
 }
@@ -166,7 +168,7 @@ void AMainPlayer::Attack()
 
 void AMainPlayer::MyJump()
 {
-	bIsJumping = true;
+	bIsJumping = true; // 점핑 상태!
 }
 
 void AMainPlayer::Landed(const FHitResult& Hit)
@@ -174,7 +176,7 @@ void AMainPlayer::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	// 땅에 닿았으면 점프 상태가 아니에요.
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "AMainPlayer::Landed() << override");
+	//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "AMainPlayer::Landed() << override");
 	bIsJumping = false;
 }
 

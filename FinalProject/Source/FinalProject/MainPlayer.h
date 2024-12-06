@@ -50,10 +50,11 @@ public:
 
 	void Attack(); // attack 키 눌렀을 때 동작하는 함수
 	void MyJump(); // jump 키 눌렀을 때 동작하는 함수
-	virtual void Landed(const FHitResult& Hit); // My Landed()..
+	virtual void Landed(const FHitResult& Hit) override; // Landed() Override
 
 	void DebugCurrentState(); // O키를 눌렀을 때, 현재 State를 알기 위한 디버깅용 함수
 
+	//! StateMachine - State
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool GetIsMoving() { return bIsMoving; }
 
