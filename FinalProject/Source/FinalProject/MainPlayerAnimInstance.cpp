@@ -2,6 +2,7 @@
 
 #include "MainPlayerAnimInstance.h"
 #include "MainPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UMainPlayerAnimInstance::UMainPlayerAnimInstance()
 	: bIsMoving(false)
@@ -121,8 +122,13 @@ void UMainPlayerAnimInstance::AnimNotify_FinishAttack3()
 
 void UMainPlayerAnimInstance::AnimNotify_StartIdleJump()
 {
-	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
-	Owner->Jump();
+	if (bIsJumping)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "UMainPlayerAnimInstance::AnimNotify_StartIdleJump()");
+		AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
+		Owner->Jump();
+	}
+
 }
 
 void UMainPlayerAnimInstance::UpdateComboSettings()

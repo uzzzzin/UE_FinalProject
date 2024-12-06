@@ -168,16 +168,26 @@ void AMainPlayer::Attack()
 
 void AMainPlayer::MyJump()
 {
-	bIsJumping = true; // 점핑 상태!
+	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	FName CurStateName = animInst->GetCurrentStateName(0);
+
+	if (!bIsJumping && GetCharacterMovement()->IsMovingOnGround())
+	{
+		bIsJumping = true; // 점핑 상태!
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Jump!!!!");
+	}
 }
 
 void AMainPlayer::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	// 땅에 닿았으면 점프 상태가 아니에요.
-	//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "AMainPlayer::Landed() << override");
-	bIsJumping = false;
+	// 점프 상태였을 때, 땅에 닿으면 점프 상태가 끝나요.
+	if (bIsJumping)
+	{
+		bIsJumping = false;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, "Landed!!");
+	}
 }
 
 void AMainPlayer::DebugCurrentState()
