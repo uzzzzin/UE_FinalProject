@@ -84,6 +84,7 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Released, this, &AMainPlayer::OffControlSpringArmYawOnly);
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMainPlayer::Attack);
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMainPlayer::MyJump);
+	PlayerInputComponent->BindAction(TEXT("DebugCurStateName"), EInputEvent::IE_Pressed, this, &AMainPlayer::DebugCurrentState);
 }
 
 void AMainPlayer::PostInitializeComponents()
@@ -173,8 +174,16 @@ void AMainPlayer::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	// 땅에 닿았으면 점프 상태가 아니에요.
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "AMainPlayer::Landed() << override");
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "AMainPlayer::Landed() << override");
 	bIsJumping = false;
+}
+
+void AMainPlayer::DebugCurrentState()
+{
+	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	FName CurStateName = animInst->GetCurrentStateName(0);
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Orange, FString::Printf(TEXT("Current State Name: %s"), *CurStateName.ToString()));
 }
 
 void AMainPlayer::OffControlSpringArmYawOnly()

@@ -52,6 +52,8 @@ public:
 	void MyJump(); // jump 키 눌렀을 때 동작하는 함수
 	virtual void Landed(const FHitResult& Hit); // My Landed()..
 
+	void DebugCurrentState(); // O키를 눌렀을 때, 현재 State를 알기 위한 디버깅용 함수
+
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool GetIsMoving() { return bIsMoving; }
 
