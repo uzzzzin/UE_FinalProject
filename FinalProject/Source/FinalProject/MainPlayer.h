@@ -32,10 +32,14 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float AttackMontagePlayRate; // Attack Animation Montage의 기본 플레이 속도.
 
-	UPROPERTY(BlueprintReadONly)
+	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bIsAttacking; // 지금 공격중이에요. ( == 공격 애니메이션 실행중이에요.)
 
 	int AttackComboNum; // Attack Montage Animation Number : 0~3 (Section Name : PoleAttack%d)
+
+	UPROPERTY(BlueprintReadOnly, Category = "State")
+	bool bIsJumping; // 지금 점프중이에요.
+
 
 public:
 	void MoveVertical(float _v); // 플레이어의 이동 함수들
@@ -45,12 +49,19 @@ public:
 	void MouseYaw(float _v);
 
 	void Attack(); // attack 키 눌렀을 때 동작하는 함수
+	void MyJump(); // jump 키 눌렀을 때 동작하는 함수
+	virtual void Landed(const FHitResult& Hit); // My Landed()..
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool GetIsMoving() { return bIsMoving; }
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool GetIsAttacking() { return bIsAttacking; }
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	void SetIsJumping(bool _v) { bIsJumping = _v; }
+	UFUNCTION(BlueprintCallable, Category = "State")
+	bool GetIsJumping() { return bIsJumping; }
 	
 	void OnControlSpringArmYawOnly() { bControlSpringArmYawOnly = true; }
 	void OffControlSpringArmYawOnly();

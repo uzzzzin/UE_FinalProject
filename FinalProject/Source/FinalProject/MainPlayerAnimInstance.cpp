@@ -20,6 +20,7 @@ void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		//! BP-> Anim State 세팅
 		bIsAttacking = Owner->GetIsAttacking();
 		bIsMoving = Owner->GetIsMoving();
+		bIsJumping = Owner->GetIsJumping();
 
 		if (false == bIsMoving) // State : Move -> Idle 초기 상태 변경
 		{
@@ -31,7 +32,6 @@ void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			InputMouseYaw = 0.f;
 			InputMousePitch = 0.f;
 		}
-
 	}
 }
 
@@ -117,6 +117,12 @@ void UMainPlayerAnimInstance::AnimNotify_FinishAttack2()
 void UMainPlayerAnimInstance::AnimNotify_FinishAttack3()
 {
 	UpdateComboSettings();
+}
+
+void UMainPlayerAnimInstance::AnimNotify_StartIdleJump()
+{
+	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
+	Owner->Jump();
 }
 
 void UMainPlayerAnimInstance::UpdateComboSettings()

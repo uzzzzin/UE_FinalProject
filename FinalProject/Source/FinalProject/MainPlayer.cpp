@@ -12,6 +12,7 @@ AMainPlayer::AMainPlayer()
 	, AttackComboNum(0)
 	, bIsAttacking(false)
 	, AttackMontagePlayRate(2.f)
+	, bIsJumping(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -82,6 +83,7 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Pressed, this, &AMainPlayer::OnControlSpringArmYawOnly);
 	PlayerInputComponent->BindAction(TEXT("ControlSpringArmYawOnly"), EInputEvent::IE_Released, this, &AMainPlayer::OffControlSpringArmYawOnly);
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMainPlayer::Attack);
+	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMainPlayer::MyJump);
 }
 
 void AMainPlayer::PostInitializeComponents()
@@ -159,6 +161,20 @@ void AMainPlayer::Attack()
 {
 	bIsAttacking = true; // 공격 상태!
 	PlayAttackMontage();
+}
+
+void AMainPlayer::MyJump()
+{
+	bIsJumping = true;
+}
+
+void AMainPlayer::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	// 땅에 닿았으면 점프 상태가 아니에요.
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "AMainPlayer::Landed() << override");
+	bIsJumping = false;
 }
 
 void AMainPlayer::OffControlSpringArmYawOnly()

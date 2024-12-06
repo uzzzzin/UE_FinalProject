@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	bool bIsAttacking; // 이동중인가?
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	bool bIsJumping; // 점핑중인가?
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InputMoveHorizontal; // ~45, +45, BS 값 조절
 
@@ -58,6 +61,10 @@ public:
 	void AnimNotify_FinishAttack2();
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_FinishAttack3();
+
+	//! Jump Sequence Notify
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_StartIdleJump();
 
 	UFUNCTION()
 	void UpdateComboSettings(); // bAttackEnded 세팅.
