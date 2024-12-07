@@ -62,6 +62,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_FinishAttack3();
 
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_EndMoveAttack();
+
 	//! Jump Sequence Notify
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_StartJump();

@@ -66,6 +66,8 @@ public:
 	bool GetIsMoving() { return bIsMoving; }
 
 	UFUNCTION(BlueprintCallable, Category = "State")
+	void SetIsAttacking(bool _v) { bIsAttacking = _v; }
+	UFUNCTION(BlueprintCallable, Category = "State")
 	bool GetIsAttacking() { return bIsAttacking; }
 
 	UFUNCTION(BlueprintCallable, Category = "State")

@@ -120,6 +120,18 @@ void UMainPlayerAnimInstance::AnimNotify_FinishAttack3()
 	UpdateComboSettings();
 }
 
+void UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()
+{
+	//! MoveAttack 애니메이션이 끝나니, MoveAttack도 끝난 거예요.
+	if (bIsAttacking)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()");
+		AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
+		Owner->SetIsAttacking(false);
+		//TODO: 중간에 딜레이 걸어서 피격효과 같은 거 넣어야 해요.
+	}
+}
+
 void UMainPlayerAnimInstance::AnimNotify_StartJump()
 {
 	if (bIsJumping)

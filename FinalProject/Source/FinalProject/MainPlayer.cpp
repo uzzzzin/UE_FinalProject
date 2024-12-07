@@ -88,6 +88,7 @@ void AMainPlayer::Tick(float DeltaTime)
 			// 점프하고, 착지하는 과정에서 통통 튀는 카메라 느낌을 주고 싶었어요.
 			FVector wantSocketOffset = FVector(0, 0, DefaultZOffset - curZDiff);
 			springArm->SocketOffset = FMath::VInterpTo(springArm->SocketOffset, wantSocketOffset, DeltaTime, 3.5f); // 3.5가 제일 어울리는 값.
+			//TODO: Camera의 위치를 조절할 때 마다, 플랫폼이 뚫리는 건 아닌지 확인하면서 조절값에 리밋을 걸어야 할 것 같아요.
 		}
 	}
 	else
@@ -192,7 +193,15 @@ void AMainPlayer::MouseYaw(float _v)
 void AMainPlayer::Attack()
 {
 	bIsAttacking = true; // 공격 상태!
-	PlayAttackMontage();
+
+	if (false == bIsMoving) // State :  IdleAttack
+	{
+		PlayAttackMontage();
+	}
+	else // true == bIsMoving // State : MoveAttack
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "true == bIsMoving");
+	}
 }
 
 void AMainPlayer::MyJump()
@@ -205,12 +214,10 @@ void AMainPlayer::MyJump()
 		if (bIsMoving) // MoveJump State
 		{
 			bIsJumping = true; 
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "MoveJump!!!!");
 		}
 		else // false == IsMoving, IdleJump State
 		{
 			bIsJumping = true; 
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "IdleJump!!!!");
 		}
 	}
 }
@@ -223,7 +230,6 @@ void AMainPlayer::Landed(const FHitResult& Hit)
 	if (bIsJumping)
 	{
 		bIsJumping = false;
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, "Landed!!");
 	}
 }
 
@@ -295,5 +301,7 @@ void AMainPlayer::OnMontageEndedCallback(UAnimMontage* Montage, bool bInterrupte
 {
 	//! AttackMontage의 현재 몽타주 섹션이 끝났을 때,
 	//! 공격중인 상태 = false;
+	//! IdleAttack에 호환됨. 
+	//! MoveAttack에는 호환되지 않음.
 	bIsAttacking = false;
 }
