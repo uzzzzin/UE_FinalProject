@@ -66,6 +66,9 @@ void AMainPlayer::BeginPlay()
 
 	//! DefaultSocketOffset 세팅
 	DefaultSocketOffset = springArm->SocketOffset;
+
+	//! DefaultMovementMaxWalkSpeed 세팅
+	DefaultMovementMaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 }
 
 void AMainPlayer::Tick(float DeltaTime)
@@ -239,6 +242,11 @@ void AMainPlayer::DebugCurrentState()
 	FName CurStateName = animInst->GetCurrentStateName(0);
 
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Orange, FString::Printf(TEXT("Current State Name: %s"), *CurStateName.ToString()));
+}
+
+void AMainPlayer::SetMovementMaxWalkSpeed(float _v)
+{
+	GetCharacterMovement()->MaxWalkSpeed = _v;
 }
 
 void AMainPlayer::OffControlSpringArmYawOnly()

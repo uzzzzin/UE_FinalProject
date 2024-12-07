@@ -126,10 +126,22 @@ void UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()
 	if (bIsAttacking)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()");
+		//TODO: 중간에 딜레이 걸어서 공격 시 효과 같은 거 넣어야 해요.
 		AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
-		Owner->SetIsAttacking(false);
-		//TODO: 중간에 딜레이 걸어서 피격효과 같은 거 넣어야 해요.
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "UMainPlayerAnimInstance::DelayEndMoveAttack()");
+		Owner->GetCharacterMovement()->MaxWalkSpeed = 0.0f; // 타이머 시간동안 캐릭터가 움직이지 않을 거예요.
+		GetWorld()->GetTimerManager().SetTimer(AnimTimer, this, &UMainPlayerAnimInstance::DelayEndMoveAttack, 1.f,false);
 	}
+}
+
+void UMainPlayerAnimInstance::DelayEndMoveAttack()
+{
+	//! 타이머가 끝나면 MoveAttack State가 끝남.
+	//! 다시 캐릭터가 움직일 수 있도록, 0으로 바꿔둔 Max Walk Speed를 기본값으로 되돌려준다.
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "UMainPlayerAnimInstance::DelayEndMoveAttack()");
+	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
+	Owner->SetIsAttacking(false);
+	Owner->SetMovementMaxWalkSpeed(Owner->GetDefaultMovementMaxWalkSpeed()); 
 }
 
 void UMainPlayerAnimInstance::AnimNotify_StartJump()

@@ -33,6 +33,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bIsMoving; // 지금 이동중이에요, state->move, AnimInstance에서 확인용.
 
+	UPROPERTY(BlueprintReadOnly)
+	float DefaultMovementMaxWalkSpeed; // 기본 GetCharacterMovement()->MaxWalkSpeed
+
 	UPROPERTY(BlueprintReadOnly) 
 	UAnimMontage* AttackMontage; // 애니메이션 몽타주 - Attack.
 
@@ -74,6 +77,12 @@ public:
 	void SetIsJumping(bool _v) { bIsJumping = _v; }
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool GetIsJumping() { return bIsJumping; }
+
+
+	UFUNCTION(BlueprintCallable) // 이 함수는 값을 바꾸는 것 (기본값을 바꾸는 게 아님.)
+	void SetMovementMaxWalkSpeed(float _v);
+	UFUNCTION(BlueprintCallable) // 이 함수는 기본값을 가져오는 것
+	float GetDefaultMovementMaxWalkSpeed() { return DefaultMovementMaxWalkSpeed; }
 	
 	void OnControlSpringArmYawOnly() { bControlSpringArmYawOnly = true; }
 	void OffControlSpringArmYawOnly();

@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAttackEnded; // (Attack Montage 애니메이션이 실행중이라는 전제), Attack이 아닌 Recovery 상태로 넘어갔을 떄 true
 	
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle AnimTimer; // 애니메이션 관련 공용 타이머
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "InputMouse")
 	void AddMouseYaw(float _v);
@@ -64,6 +67,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_EndMoveAttack();
+	UFUNCTION(BlueprintCallable)
+	void DelayEndMoveAttack(); // EndMoveAttack - Timer CallBack Func
 
 	//! Jump Sequence Notify
 	UFUNCTION(BlueprintCallable)
