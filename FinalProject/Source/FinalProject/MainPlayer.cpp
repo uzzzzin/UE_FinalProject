@@ -173,8 +173,16 @@ void AMainPlayer::MyJump()
 
 	if (!bIsJumping && GetCharacterMovement()->IsMovingOnGround())
 	{
-		bIsJumping = true; // 점핑 상태!
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Jump!!!!");
+		if (bIsMoving) // MoveJump State
+		{
+			bIsJumping = true; 
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "MoveJump!!!!");
+		}
+		else // false == IsMoving, IdleJump State
+		{
+			bIsJumping = true; 
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "IdleJump!!!!");
+		}
 	}
 }
 

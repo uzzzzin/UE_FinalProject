@@ -64,7 +64,7 @@ public:
 
 	//! Jump Sequence Notify
 	UFUNCTION(BlueprintCallable)
-	void AnimNotify_StartIdleJump();
+	void AnimNotify_StartJump();
 
 	UFUNCTION()
 	void UpdateComboSettings(); // bAttackEnded ¼¼ÆÃ.

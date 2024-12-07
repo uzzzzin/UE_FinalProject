@@ -120,11 +120,11 @@ void UMainPlayerAnimInstance::AnimNotify_FinishAttack3()
 	UpdateComboSettings();
 }
 
-void UMainPlayerAnimInstance::AnimNotify_StartIdleJump()
+void UMainPlayerAnimInstance::AnimNotify_StartJump()
 {
 	if (bIsJumping)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "UMainPlayerAnimInstance::AnimNotify_StartIdleJump()");
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "UMainPlayerAnimInstance::AnimNotify_StartJump()");
 		AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 		Owner->Jump();
 	}
