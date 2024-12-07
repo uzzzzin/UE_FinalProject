@@ -59,6 +59,13 @@ AMainPlayer::AMainPlayer()
 void AMainPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//! DefaultZOffset 세팅
+	FVector CameraWorldPos = GetCameraWorldLocation();
+	DefaultZOffset = GetActorLocation().Z - CameraWorldPos.Z; // 캐릭터.Z - 카메라 위치.Z
+
+	//! DefaultSocketOffset 세팅
+	DefaultSocketOffset = springArm->SocketOffset;
 }
 
 void AMainPlayer::Tick(float DeltaTime)
@@ -67,6 +74,28 @@ void AMainPlayer::Tick(float DeltaTime)
 	
 	// 캐릭터 이동중인지 확인, AnimInstance에서 State변경 시 사용.
 	bIsMoving = (GetVelocity().Size() > 0.f) && (GetCharacterMovement()->IsMovingOnGround());
+
+	//! 점프 상태에서, 카메라의 Z와 점프했을 떄의 캐릭터의 Z를 동기화.
+	if (bIsJumping)
+	{
+		//! 점프 상태에서 카메라 통통 튀고 싶어요.
+		FVector curCameraPos = GetCameraWorldLocation();
+		float curZDiff = GetActorLocation().Z - curCameraPos.Z; // 현재 캐릭터.Z - 카메라 위치.Z
+
+		if (curZDiff != DefaultZOffset) // 기본 Z Offset이랑 현재 Z Offset이 다르다면 --> Z값의 차이가 생겼어요 (당연히 점프 상태니 생김.)
+		{
+			// Camera의 위치를 Socket Offset을 통해 조절해요.
+			// 점프하고, 착지하는 과정에서 통통 튀는 카메라 느낌을 주고 싶었어요.
+			FVector wantSocketOffset = FVector(0, 0, DefaultZOffset - curZDiff);
+			springArm->SocketOffset = FMath::VInterpTo(springArm->SocketOffset, wantSocketOffset, DeltaTime, 3.5f); // 3.5가 제일 어울리는 값.
+		}
+	}
+	else
+	{
+		// Spring Arm -> Socket Offset 다시 스르르 DEfault 값으로 변경
+		springArm->SocketOffset = FMath::VInterpTo(springArm->SocketOffset, DefaultSocketOffset, DeltaTime, 3.5f);
+
+	}
 }
 
 void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -210,6 +239,18 @@ void AMainPlayer::OffControlSpringArmYawOnly()
 {
 	bControlSpringArmYawOnly = false;
 	springArm->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f)); // 다시 기본 SpringArm 값으로 세팅
+}
+
+FVector AMainPlayer::GetCameraWorldLocation()
+{
+	//! SpringArm에 부착된 Camera의 WorldPos 구하기.
+	FVector armPos = springArm->GetComponentLocation();
+	FVector armDir = springArm->GetForwardVector();
+	float armLength = springArm->TargetArmLength;
+
+	FVector CameraWorldPos = armPos + (-armDir * armLength); // camera world pos 계산과정이에요.
+
+	return CameraWorldPos;
 }
 
 void AMainPlayer::PlayAttackMontage() // Attack 키 눌렸어요

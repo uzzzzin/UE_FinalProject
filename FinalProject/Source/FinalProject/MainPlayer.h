@@ -18,6 +18,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UCameraComponent* camera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float DefaultZOffset; // 기본값, 카메라 암과 캐릭터의 Z축 높이 차이
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector DefaultSocketOffset; // 기본값, Camera Socket Offset
+
+
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TSubclassOf<UAnimInstance> AnimInstanceBP;
 
@@ -68,6 +75,9 @@ public:
 	
 	void OnControlSpringArmYawOnly() { bControlSpringArmYawOnly = true; }
 	void OffControlSpringArmYawOnly();
+
+	//! SpringArm에 부착된 Camera의 WorldPos 구하는 함수.
+	FVector GetCameraWorldLocation();
 	
 public:
 	//! Attack Montage용 Funcs.
