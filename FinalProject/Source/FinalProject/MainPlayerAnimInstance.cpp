@@ -8,6 +8,8 @@ UMainPlayerAnimInstance::UMainPlayerAnimInstance()
 	: bIsMoving(false)
 	, bIsAttacking(false)
 	, bAttackEnded(true) // 초기는 바로 공격 가능할 수 있도록 true.
+	, bIsSiuuuuing(false)
+	, SiuuuuAttackDuration(1.f)
 {
 }
 
@@ -33,6 +35,11 @@ void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			InputMouseYaw = 0.f;
 			InputMousePitch = 0.f;
 		}
+	}
+
+	if (bIsSiuuuuing)
+	{
+		//TODO: Siuuuu 타이머 돌아가는 동안에만 동작해요. 공격 투사체 와다다다 던질 예정.
 	}
 }
 
@@ -142,6 +149,7 @@ void UMainPlayerAnimInstance::DelayEndMoveAttack()
 	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 	Owner->SetIsAttacking(false);
 	Owner->SetMovementMaxWalkSpeed(Owner->GetDefaultMovementMaxWalkSpeed()); 
+	GetWorld()->GetTimerManager().ClearTimer(AnimTimer);
 }
 
 void UMainPlayerAnimInstance::AnimNotify_StartJump()
@@ -152,7 +160,21 @@ void UMainPlayerAnimInstance::AnimNotify_StartJump()
 		AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 		Owner->Jump();
 	}
+}
 
+void UMainPlayerAnimInstance::AnimNotify_StartSiuuuuStop()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "UMainPlayerAnimInstance::AnimNotify_StartSiuuuuStop()");
+	//TODO: Siuuuu Stop Timer 작동시켜야 해요
+	bIsSiuuuuing = true; // 타이머 시작하니까 이제 Siuuuu 타임이에요.
+	GetWorld()->GetTimerManager().SetTimer(AnimTimer, this, &UMainPlayerAnimInstance::AfterTimerSiuuuuStop, SiuuuuAttackDuration, false);
+}
+
+void UMainPlayerAnimInstance::AfterTimerSiuuuuStop()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "UMainPlayerAnimInstance::AfterTimerSiuuuuStop()");
+	bIsSiuuuuing = false; // 타이머 끝났으니까 이제 Siuuuu 타임은 끝났어요.
+	GetWorld()->GetTimerManager().ClearTimer(AnimTimer);
 }
 
 void UMainPlayerAnimInstance::UpdateComboSettings()

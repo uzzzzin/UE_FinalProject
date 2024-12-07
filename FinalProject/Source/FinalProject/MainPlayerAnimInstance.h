@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	bool bIsJumping; // 점핑중인가?
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	bool bIsSiuuuuing; // Siuuuu중인가?
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InputMoveHorizontal; // ~45, +45, BS 값 조절
 
@@ -39,6 +42,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle AnimTimer; // 애니메이션 관련 공용 타이머
+
+	UPROPERTY(BlueprintReadOnly)
+	float SiuuuuAttackDuration; // SiuuuuAttack시간. 사실은 SiuuuuStop 후 얼마동안 멈춰있는지에 대한 시간.
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "InputMouse")
@@ -65,14 +71,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_FinishAttack3();
 
+	//! Animation Sequence Notify
+	//! Move Attack
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_EndMoveAttack();
 	UFUNCTION(BlueprintCallable)
 	void DelayEndMoveAttack(); // EndMoveAttack - Timer CallBack Func
 
-	//! Jump Sequence Notify
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_StartJump();
+
+	//! Siuuuu Attack
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_StartSiuuuuStop();
+	UFUNCTION(BlueprintCallable)
+	void AfterTimerSiuuuuStop(); // SiuuuuAttack Timer CallBack Func
 
 	UFUNCTION()
 	void UpdateComboSettings(); // bAttackEnded 세팅.
