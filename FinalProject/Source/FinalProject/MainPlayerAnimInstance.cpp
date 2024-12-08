@@ -7,7 +7,6 @@
 UMainPlayerAnimInstance::UMainPlayerAnimInstance()
 	: bIsMoving(false)
 	, bIsAttacking(false)
-	, bAttackEnded(true) // 초기는 바로 공격 가능할 수 있도록 true.
 	, bIsSiuuuuing(false)
 	, SiuuuuAttackDuration(1.f)
 {
@@ -106,33 +105,6 @@ void UMainPlayerAnimInstance::AddMoveVertical(float _v)
 		}
 	}
 }
-
-void UMainPlayerAnimInstance::AnimNotify_FinishAttack0()
-{
-	UpdateComboSettings();
-}
-
-void UMainPlayerAnimInstance::AnimNotify_FinishAttack1()
-{
-	UpdateComboSettings();
-}
-
-void UMainPlayerAnimInstance::AnimNotify_FinishAttack2()
-{
-	UpdateComboSettings();
-}
-
-void UMainPlayerAnimInstance::AnimNotify_FinishAttack3()
-{
-	UpdateComboSettings();
-}
-
-void UMainPlayerAnimInstance::AnimNotify_FinishAttackAndRecovery()
-{
-	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
-	Owner->SetMovementMaxWalkSpeed(Owner->GetDefaultMovementMaxWalkSpeed());
-}
-
 void UMainPlayerAnimInstance::AnimNotify_EndIdleAttack()
 {
 	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
@@ -191,18 +163,4 @@ void UMainPlayerAnimInstance::AfterTimerSiuuuuStop()
 	Owner->SetMovementMaxWalkSpeed(Owner->GetDefaultMovementMaxWalkSpeed());
 	bIsSiuuuuing = false; // 타이머 끝났으니까 이제 Siuuuu 타임은 끝났어요.
 	GetWorld()->GetTimerManager().ClearTimer(AnimTimer);
-}
-
-void UMainPlayerAnimInstance::UpdateComboSettings()
-{
-	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
-
-	if (true == Owner->GetIsAttacking()) // 공격 상태 -> recovery로 가는 중
-	{
-		bAttackEnded = true; // Attack Montage가 실행중인데 딱 Recovery Noti에 걸림.(아직 recovery 상태가 아닐 때)
-	}
-	else // false == Owner->GetIsAttacking()
-	{
-		bAttackEnded = true;
-	}
 }

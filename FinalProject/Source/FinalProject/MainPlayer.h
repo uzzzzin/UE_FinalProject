@@ -36,16 +36,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float DefaultMovementMaxWalkSpeed; // 기본 GetCharacterMovement()->MaxWalkSpeed
 
-	UPROPERTY(BlueprintReadOnly) 
-	UAnimMontage* AttackMontage; // 애니메이션 몽타주 - Attack.
-
-	UPROPERTY(BlueprintReadOnly)
-	float AttackMontagePlayRate; // Attack Animation Montage의 기본 플레이 속도.
-
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bIsAttacking; // 지금 공격중이에요. ( == 공격 애니메이션 실행중이에요.)
-
-	int AttackComboNum; // Attack Montage Animation Number : 0~3 (Section Name : PoleAttack%d)
 
 	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bIsJumping; // 지금 점프중이에요.
@@ -91,12 +83,6 @@ public:
 	FVector GetCameraWorldLocation();
 	
 public:
-	//! Attack Montage용 Funcs.
-	void PlayAttackMontage(); // MainPlayer용 공격 Montage 관련 Play 함수.
-
-	UFUNCTION(BlueprintCallable) // 애니메이션 Notify에서 쓸거예요.
-	UAnimMontage* GetAttackMontage() { return AttackMontage; }
-
 	UFUNCTION() // Montage가 끝났을 떄 실행되는 델리게이트 콜백 함수.
 	void OnMontageEndedCallback(UAnimMontage* Montage, bool bInterrupted);
 

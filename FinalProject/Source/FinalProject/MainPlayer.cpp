@@ -9,9 +9,7 @@
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
 	, bIsMoving(false)
-	, AttackComboNum(0)
 	, bIsAttacking(false)
-	, AttackMontagePlayRate(2.f)
 	, bIsJumping(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -43,13 +41,6 @@ AMainPlayer::AMainPlayer()
 	if (AnimBPClass.Class)
 	{
 		AnimInstanceBP = AnimBPClass.Class;
-	}
-
-	//! Attack Montage 세팅
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> montage(TEXT("/Script/Engine.AnimMontage'/Game/Player/AM_MainPlayer_Attack_Pole.AM_MainPlayer_Attack_Pole'"));
-	if (montage.Succeeded())
-	{
-		AttackMontage = montage.Object;
 	}
 
 	//! 마우스로 제어하는 시야 세팅
@@ -199,8 +190,7 @@ void AMainPlayer::Attack()
 
 	if (false == bIsMoving) // State :  IdleAttack
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 0.0f; // IdleAttack(DefaultAttack)일 동안에는 캐릭터가 움직이지 않을 거예요.
-		//PlayAttackMontage();
+		GetCharacterMovement()->MaxWalkSpeed = 0.0f; // IdleAttack(DefaultAttack) 동안에는 캐릭터가 움직이지 않을 거예요.
 	}
 	else // true == bIsMoving // State : MoveAttack
 	{
@@ -268,49 +258,9 @@ FVector AMainPlayer::GetCameraWorldLocation()
 	return CameraWorldPos;
 }
 
-void AMainPlayer::PlayAttackMontage() // Attack 키 눌렸어요
-{
-	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	
-	if (!animInst->Montage_IsPlaying(AttackMontage)) // 공격 애니메이션이 실행중이지 않은 상태.
-	{
-		if (true == animInst->GetbAttackEnded()) // recovery 상태 혹은 아무 상태가 아님 --> 공격 유효
-		{
-			animInst->Montage_Play(AttackMontage, AttackMontagePlayRate);
-			animInst->SetbAttackEnded(false);
-			// 매번 다른 애니메이션이 실행될 수 있도록.
-			animInst->Montage_JumpToSection(FName(*FString::Printf(TEXT("PoleAttack%d"), AttackComboNum)), AttackMontage);
-			if (AttackComboNum >= 3)
-				AttackComboNum = 0;
-			else
-				AttackComboNum += 1;
-		}
-		// else -> 아무 상태도 아니에요, 들어올 경우가 없는 상태로 예상. (recovery 상태가 아니에요.) --> 공격은 씹혀요.
-	}
-	else // 공격 애니메이션이 실행중일 때, == 공격 키를 연타해서 함수에 들어온 상태임.
-	{
-		if (true == animInst->GetbAttackEnded()) // 지금 현재 애니메이션이 recovery 상태 --> 공격 유효 !
-		{
-			//TODO 애니메이션 실행 속도가 너무 빨라지니 애니메이션이 씹혀요. 주의해서 값 조절.
-			animInst->Montage_SetPlayRate(AttackMontage, AttackMontagePlayRate * 1.3f); // Recovery 애니메이션 속도를 빠르게 해서 얼른 애니메이션이 끝나도록. 
-			animInst->Montage_Play(AttackMontage, AttackMontagePlayRate);
-			animInst->SetbAttackEnded(false);
-			// 매번 다른 애니메이션이 실행될 수 있도록.
-			animInst->Montage_JumpToSection(FName(*FString::Printf(TEXT("PoleAttack%d"), AttackComboNum)), AttackMontage);
-			if (AttackComboNum >= 3)
-				AttackComboNum = 0;
-			else
-				AttackComboNum += 1;
-		}
-		// else // false == animInst->GetbAttackEnded() // 지금 현재 공격 상태 (recovery 상태는 아직 오지 않아따..) --> 공격은 씹혀요.
-	}
-}
-
 void AMainPlayer::OnMontageEndedCallback(UAnimMontage* Montage, bool bInterrupted)
 {
-	//! AttackMontage의 현재 몽타주 섹션이 끝났을 때,
-	//! 공격중인 상태 = false;
-	//! IdleAttack에 호환됨. 
-	//! MoveAttack에는 호환되지 않음.
+	//! 여기에 절대 들어오면 안됨미닷
 	bIsAttacking = false;
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, TEXT("AMainPlayer::OnMontageEndedCallback()"));
 }
