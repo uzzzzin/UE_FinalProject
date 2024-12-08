@@ -199,7 +199,8 @@ void AMainPlayer::Attack()
 
 	if (false == bIsMoving) // State :  IdleAttack
 	{
-		PlayAttackMontage();
+		GetCharacterMovement()->MaxWalkSpeed = 0.0f; // IdleAttack(DefaultAttack)일 동안에는 캐릭터가 움직이지 않을 거예요.
+		//PlayAttackMontage();
 	}
 	else // true == bIsMoving // State : MoveAttack
 	{

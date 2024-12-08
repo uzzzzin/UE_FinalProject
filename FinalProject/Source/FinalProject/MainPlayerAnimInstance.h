@@ -62,6 +62,7 @@ public:
 	void AddMoveVertical(float _v);
 
 	//! Attack Montage Notify
+	//TODO: Montage 함수들은 곧 정리가 될 거예요.
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_FinishAttack0();
 	UFUNCTION(BlueprintCallable)
@@ -70,6 +71,11 @@ public:
 	void AnimNotify_FinishAttack2();
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_FinishAttack3();
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_FinishAttackAndRecovery(); 
+
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_EndIdleAttack();
 
 	//! Animation Sequence Notify
 	//! Move Attack

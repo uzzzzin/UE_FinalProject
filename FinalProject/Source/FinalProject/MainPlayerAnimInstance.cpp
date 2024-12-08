@@ -127,6 +127,19 @@ void UMainPlayerAnimInstance::AnimNotify_FinishAttack3()
 	UpdateComboSettings();
 }
 
+void UMainPlayerAnimInstance::AnimNotify_FinishAttackAndRecovery()
+{
+	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
+	Owner->SetMovementMaxWalkSpeed(Owner->GetDefaultMovementMaxWalkSpeed());
+}
+
+void UMainPlayerAnimInstance::AnimNotify_EndIdleAttack()
+{
+	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
+	Owner->SetIsAttacking(false);
+	Owner->SetMovementMaxWalkSpeed(Owner->GetDefaultMovementMaxWalkSpeed());
+}
+
 void UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()
 {
 	//! MoveAttack 애니메이션이 끝나니, MoveAttack도 끝난 거예요.
