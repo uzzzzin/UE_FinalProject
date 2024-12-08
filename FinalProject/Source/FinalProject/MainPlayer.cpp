@@ -11,6 +11,7 @@ AMainPlayer::AMainPlayer()
 	, bIsMoving(false)
 	, bIsAttacking(false)
 	, bIsJumping(false)
+	, bIsSiuuuuAttacking(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -90,6 +91,29 @@ void AMainPlayer::Tick(float DeltaTime)
 		// Spring Arm -> Socket Offset 다시 스르르 DEfault 값으로 변경
 		springArm->SocketOffset = FMath::VInterpTo(springArm->SocketOffset, DefaultSocketOffset, DeltaTime, 3.5f);
 
+	}
+
+	//! Debug - State가 변하는 시점 확인
+	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	curState = animInst->GetCurrentStateName(0);
+	if (curState != prevState)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("%s -> %s"), *prevState.ToString() ,*curState.ToString()));
+		prevState = curState;
+	}
+
+	//! Debug - Attacking 확인 변수의 값이 변하는 시점 확인
+	if (prevIsAttacking != bIsAttacking)
+	{
+		if (bIsAttacking)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("IsAttacking : false -> true"));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("IsAttacking : true -> false"));
+		}
+		prevIsAttacking = bIsAttacking;
 	}
 }
 
@@ -186,15 +210,36 @@ void AMainPlayer::MouseYaw(float _v)
 
 void AMainPlayer::Attack()
 {
-	bIsAttacking = true; // 공격 상태!
+	if (false == bIsAttacking) // Attack 중일 땐, 모든 공격이 씹혀야 해요.
+	{
+		bIsAttacking = true; // 공격 상태!
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "AMainPlayer::Attack()");
 
-	if (false == bIsMoving) // State :  IdleAttack
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 0.0f; // IdleAttack(DefaultAttack) 동안에는 캐릭터가 움직이지 않을 거예요.
-	}
-	else // true == bIsMoving // State : MoveAttack
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "true == bIsMoving");
+		if (false == bIsMoving && GetVelocity().Size() <= 0.f) // 속도가 안 나야 정말 Idle 상태.
+		{
+			if (true == bIsJumping) // 무빙중이 아닌데 점프중임 -> State : IdleJump
+			{
+				bIsAttacking = false; // IdleJump일 때는 공격이 씹히도록.
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Purple, "???");
+			}
+			else // 무빙중이 아닌데 점프중도 아님. -> State : IdleAttack
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, "???");
+				GetCharacterMovement()->MaxWalkSpeed = 0.0f; // IdleAttack(DefaultAttack) 동안에는 캐릭터가 움직이지 않을 거예요.
+			}
+		}
+		else // true == bIsMoving // State : MovetAtack or SiuuuuAttack
+		{
+			if (bIsJumping) // 무빙중인데, 심지어 점프중? State : SiuuuuAttack
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "???");
+				bIsSiuuuuAttacking = true;
+			}
+			else // 점프중이 아니면 State : MoveAttack
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "???");
+			}
+		}
 	}
 }
 
@@ -213,6 +258,11 @@ void AMainPlayer::MyJump()
 		{
 			bIsJumping = true; 
 		}
+	}
+
+	if (bIsMoving && bIsAttacking) // 무빙중, 공격중 -> State : MoveAttack
+	{
+		bIsJumping = false;
 	}
 }
 

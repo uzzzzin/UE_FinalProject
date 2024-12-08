@@ -29,7 +29,10 @@ public:
 	bool bIsJumping; // 점핑중인가?
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	bool bIsSiuuuuing; // Siuuuu중인가?
+	bool bIsSiuuuuAttacking; // Siuuuu중인가? (State)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	bool bIsSiuuuuTiming; // Siuuuu 타이머를 돌고 있는가? 얘는 애님 인스턴스 소속이에요
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InputMoveHorizontal; // ~45, +45, BS 값 조절
@@ -75,6 +78,10 @@ public:
 	void AnimNotify_StartJump();
 
 	//! Siuuuu Attack
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_StartSiuuuuAttack();
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_EndSiuuuuAttack();
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_StartSiuuuuStop();
 	UFUNCTION(BlueprintCallable)

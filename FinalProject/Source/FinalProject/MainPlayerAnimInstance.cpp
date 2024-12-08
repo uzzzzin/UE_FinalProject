@@ -7,7 +7,8 @@
 UMainPlayerAnimInstance::UMainPlayerAnimInstance()
 	: bIsMoving(false)
 	, bIsAttacking(false)
-	, bIsSiuuuuing(false)
+	, bIsSiuuuuAttacking(false)
+	, bIsSiuuuuTiming(false)
 	, SiuuuuAttackDuration(1.f)
 {
 }
@@ -23,6 +24,7 @@ void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsAttacking = Owner->GetIsAttacking();
 		bIsMoving = Owner->GetIsMoving();
 		bIsJumping = Owner->GetIsJumping();
+		bIsSiuuuuAttacking = Owner->GetIsSiuuuuAttacking();
 
 		if (false == bIsMoving) // State : Move -> Idle 초기 상태 변경
 		{
@@ -36,7 +38,7 @@ void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 
-	if (bIsSiuuuuing)
+	if (true == bIsSiuuuuTiming)
 	{
 		//TODO: Siuuuu 타이머 돌아가는 동안에만 동작해요. 공격 투사체 와다다다 던질 예정.
 	}
@@ -117,7 +119,7 @@ void UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()
 	//! MoveAttack 애니메이션이 끝나니, MoveAttack도 끝난 거예요.
 	if (bIsAttacking)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()");
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, "UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()");
 		//TODO: 중간에 딜레이 걸어서 공격 시 효과 같은 거 넣어야 해요.
 		AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 		Owner->GetCharacterMovement()->MaxWalkSpeed = 0.0f; // 타이머 시간동안 캐릭터가 움직이지 않을 거예요.
@@ -129,7 +131,7 @@ void UMainPlayerAnimInstance::DelayEndMoveAttack()
 {
 	//! 타이머가 끝나면 MoveAttack State가 끝남.
 	//! 다시 캐릭터가 움직일 수 있도록, 0으로 바꿔둔 Max Walk Speed를 기본값으로 되돌려준다.
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "UMainPlayerAnimInstance::DelayEndMoveAttack()");
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "UMainPlayerAnimInstance::DelayEndMoveAttack()");
 	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 	Owner->SetIsAttacking(false);
 	Owner->SetMovementMaxWalkSpeed(Owner->GetDefaultMovementMaxWalkSpeed()); 
@@ -140,17 +142,23 @@ void UMainPlayerAnimInstance::AnimNotify_StartJump()
 {
 	if (bIsJumping)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "UMainPlayerAnimInstance::AnimNotify_StartJump()");
 		AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 		Owner->Jump();
 	}
 }
 
+void UMainPlayerAnimInstance::AnimNotify_StartSiuuuuAttack()
+{
+}
+
+void UMainPlayerAnimInstance::AnimNotify_EndSiuuuuAttack()
+{
+	bIsSiuuuuTiming = true; // 이제 SiuuuuStop으로 넘어가요.
+}
+
 void UMainPlayerAnimInstance::AnimNotify_StartSiuuuuStop()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "UMainPlayerAnimInstance::AnimNotify_StartSiuuuuStop()");
 	//TODO: Siuuuu Stop Timer 작동시켜야 해요
-	bIsSiuuuuing = true; // 타이머 시작하니까 이제 Siuuuu 타임이에요.
 	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 	Owner->GetCharacterMovement()->MaxWalkSpeed = 0.0f; // 타이머 시간동안 캐릭터가 움직이지 않을 거예요.
 	GetWorld()->GetTimerManager().SetTimer(AnimTimer, this, &UMainPlayerAnimInstance::AfterTimerSiuuuuStop, SiuuuuAttackDuration, false);
@@ -158,9 +166,12 @@ void UMainPlayerAnimInstance::AnimNotify_StartSiuuuuStop()
 
 void UMainPlayerAnimInstance::AfterTimerSiuuuuStop()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "UMainPlayerAnimInstance::AfterTimerSiuuuuStop()");
 	AMainPlayer* Owner = Cast<AMainPlayer>(TryGetPawnOwner());
 	Owner->SetMovementMaxWalkSpeed(Owner->GetDefaultMovementMaxWalkSpeed());
-	bIsSiuuuuing = false; // 타이머 끝났으니까 이제 Siuuuu 타임은 끝났어요.
+
+	bIsSiuuuuTiming = false; // 타이머 끝났으니까 이제 Siuuuu 타임은 끝났어요.
+	Owner->SetIsSiuuuuAttacking(false); // SiuuuuAttack도 끝나요.
+	Owner->SetIsAttacking(false); // Siuuuu Attack 이 모두 끝났으니 공격은 False 가 되어요.
 	GetWorld()->GetTimerManager().ClearTimer(AnimTimer);
+
 }

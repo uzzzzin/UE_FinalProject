@@ -40,8 +40,18 @@ public:
 	bool bIsAttacking; // 지금 공격중이에요. ( == 공격 애니메이션 실행중이에요.)
 
 	UPROPERTY(BlueprintReadOnly, Category = "State")
+	bool bIsSiuuuuAttacking; // 지금 Siuuuu 공격중이에요. ( == 공격 애니메이션 실행중이에요.)
+
+	UPROPERTY(BlueprintReadOnly, Category = "State")
 	bool bIsJumping; // 지금 점프중이에요.
 
+	//! Debug - State
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	FName prevState; // 1틱 전 State
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	FName curState; // 현재 State
+
+	bool prevIsAttacking; // 디버깅용 현재 Attacking 값 확인
 
 public:
 	void MoveVertical(float _v); // 플레이어의 이동 함수들
@@ -64,6 +74,11 @@ public:
 	void SetIsAttacking(bool _v) { bIsAttacking = _v; }
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool GetIsAttacking() { return bIsAttacking; }
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	bool GetIsSiuuuuAttacking() { return bIsSiuuuuAttacking; }
+	UFUNCTION(BlueprintCallable, Category = "State")
+	void SetIsSiuuuuAttacking(bool _v) { bIsSiuuuuAttacking = _v; }
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 	void SetIsJumping(bool _v) { bIsJumping = _v; }
