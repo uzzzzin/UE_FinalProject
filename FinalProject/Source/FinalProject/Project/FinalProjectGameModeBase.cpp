@@ -2,7 +2,7 @@
 
 #include "FinalProjectGameModeBase.h"
 
-#include "MainPlayer.h"
+#include "../object/MainPlayer.h"
 
 AFinalProjectGameModeBase::AFinalProjectGameModeBase()
 {

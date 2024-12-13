@@ -3,15 +3,11 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "../Component/StateMachineComponent.h"
 #include "MainPlayerAnimInstance.h"
 
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
-	, bIsMoving(false)
-	, bIsAttacking(false)
-	, bIsJumping(false)
-	, bIsSiuuuuAttacking(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -44,6 +40,11 @@ AMainPlayer::AMainPlayer()
 		AnimInstanceBP = AnimBPClass.Class;
 	}
 
+	//! State Machine 설정
+	SM = CreateDefaultSubobject<UStateMachineComponent>(TEXT("SM"));
+	//SM->LoadFSMData(TEXT("/Script/Engine.DataTable'/Game/Data/MainPlayerStateMachine.MainPlayerStateMachine'"));
+	SM->SetFSMDataPath(TEXT("/Script/Engine.DataTable'/Game/Data/MainPlayerStateMachine.MainPlayerStateMachine'"));
+
 	//! 마우스로 제어하는 시야 세팅
 	bUseControllerRotationPitch = true; // 무브먼트 이용해서 Pitch Rotation 가능하도록 설정.
 }
@@ -66,55 +67,6 @@ void AMainPlayer::BeginPlay()
 void AMainPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	// 캐릭터 이동중인지 확인, AnimInstance에서 State변경 시 사용.
-	bIsMoving = (GetVelocity().Size() > 0.f) && (GetCharacterMovement()->IsMovingOnGround());
-
-	//! 점프 상태에서, 카메라의 Z와 점프했을 떄의 캐릭터의 Z를 동기화.
-	if (bIsJumping)
-	{
-		//! 점프 상태에서 카메라 통통 튀고 싶어요.
-		FVector curCameraPos = GetCameraWorldLocation();
-		float curZDiff = GetActorLocation().Z - curCameraPos.Z; // 현재 캐릭터.Z - 카메라 위치.Z
-
-		if (curZDiff != DefaultZOffset) // 기본 Z Offset이랑 현재 Z Offset이 다르다면 --> Z값의 차이가 생겼어요 (당연히 점프 상태니 생김.)
-		{
-			// Camera의 위치를 Socket Offset을 통해 조절해요.
-			// 점프하고, 착지하는 과정에서 통통 튀는 카메라 느낌을 주고 싶었어요.
-			FVector wantSocketOffset = FVector(0, 0, DefaultZOffset - curZDiff);
-			springArm->SocketOffset = FMath::VInterpTo(springArm->SocketOffset, wantSocketOffset, DeltaTime, 3.5f); // 3.5가 제일 어울리는 값.
-			//TODO: Camera의 위치를 조절할 때 마다, 플랫폼이 뚫리는 건 아닌지 확인하면서 조절값에 리밋을 걸어야 할 것 같아요.
-		}
-	}
-	else
-	{
-		// Spring Arm -> Socket Offset 다시 스르르 DEfault 값으로 변경
-		springArm->SocketOffset = FMath::VInterpTo(springArm->SocketOffset, DefaultSocketOffset, DeltaTime, 3.5f);
-
-	}
-
-	//! Debug - State가 변하는 시점 확인
-	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	curState = animInst->GetCurrentStateName(0);
-	if (curState != prevState)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("%s -> %s"), *prevState.ToString() ,*curState.ToString()));
-		prevState = curState;
-	}
-
-	//! Debug - Attacking 확인 변수의 값이 변하는 시점 확인
-	if (prevIsAttacking != bIsAttacking)
-	{
-		if (bIsAttacking)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("IsAttacking : false -> true"));
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("IsAttacking : true -> false"));
-		}
-		prevIsAttacking = bIsAttacking;
-	}
 }
 
 void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -151,6 +103,19 @@ void AMainPlayer::PostInitializeComponents()
 	//! Attack Montage -> OnMontageEnded (내장)델리게이트 Binding (몽타주가 끝났을 때)
 	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->OnMontageEnded.AddDynamic(this, &AMainPlayer::OnMontageEndedCallback);
+
+	//! StateMachine CSV 데이터 불러오기.
+	SM->LoadFSMData(TEXT("/Script/Engine.DataTable'/Game/Data/MainPlayerStateMachine.MainPlayerStateMachine'"));
+	
+	if (nullptr == SM->GetFSMData())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("( FAIL : PostInitializeComponents() FSMData is Nullptr. )"));
+	}
+	else
+	{
+		//SM->SetCurFSM(SM->GetFSMKeys()[0]);
+		//SM->GetCurFSM()->SetCurStateName(SM->GetCurFSM()->GetStateKeys()[0]);
+	}
 }
 
 void AMainPlayer::MoveVertical(float _v)
@@ -158,7 +123,6 @@ void AMainPlayer::MoveVertical(float _v)
 	if (_v != 0)
 	{
 		this->AddMovementInput(this->GetActorForwardVector(), _v); // 앞, 뒤
-		bIsMoving = true; // 키를 누르고 있을 때 속력이 없더라도 움직임 상태로 유지하고 싶음.
 	}
 	Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->AddMoveVertical(_v);
 }
@@ -168,7 +132,6 @@ void AMainPlayer::MoveHorizontal(float _v)
 	if (_v != 0)
 	{
 		this->AddMovementInput(this->GetActorRightVector(), _v); // 좌, 우
-		bIsMoving = true; // 키를 누르고 있을 때, 속력이 없더라도 움직임 상태로 유지하고 싶음.
 	}
 	Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance())->AddMoveHorizontal(_v); // BS-Jog 각도 변경
 }
@@ -210,71 +173,15 @@ void AMainPlayer::MouseYaw(float _v)
 
 void AMainPlayer::Attack()
 {
-	if (false == bIsAttacking) // Attack 중일 땐, 모든 공격이 씹혀야 해요.
-	{
-		bIsAttacking = true; // 공격 상태!
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "AMainPlayer::Attack()");
-
-		if (false == bIsMoving && GetVelocity().Size() <= 0.f) // 속도가 안 나야 정말 Idle 상태.
-		{
-			if (true == bIsJumping) // 무빙중이 아닌데 점프중임 -> State : IdleJump
-			{
-				bIsAttacking = false; // IdleJump일 때는 공격이 씹히도록.
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Purple, "???");
-			}
-			else // 무빙중이 아닌데 점프중도 아님. -> State : IdleAttack
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, "???");
-				GetCharacterMovement()->MaxWalkSpeed = 0.0f; // IdleAttack(DefaultAttack) 동안에는 캐릭터가 움직이지 않을 거예요.
-			}
-		}
-		else // true == bIsMoving // State : MovetAtack or SiuuuuAttack
-		{
-			if (bIsJumping) // 무빙중인데, 심지어 점프중? State : SiuuuuAttack
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, "???");
-				bIsSiuuuuAttacking = true;
-			}
-			else // 점프중이 아니면 State : MoveAttack
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "???");
-			}
-		}
-	}
 }
 
 void AMainPlayer::MyJump()
 {
-	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	FName CurStateName = animInst->GetCurrentStateName(0);
-
-	if (!bIsJumping && GetCharacterMovement()->IsMovingOnGround())
-	{
-		if (bIsMoving) // MoveJump State
-		{
-			bIsJumping = true; 
-		}
-		else // false == IsMoving, IdleJump State
-		{
-			bIsJumping = true; 
-		}
-	}
-
-	if (bIsMoving && bIsAttacking) // 무빙중, 공격중 -> State : MoveAttack
-	{
-		bIsJumping = false;
-	}
 }
 
 void AMainPlayer::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
-
-	// 점프 상태였을 때, 땅에 닿으면 점프 상태가 끝나요.
-	if (bIsJumping)
-	{
-		bIsJumping = false;
-	}
 }
 
 void AMainPlayer::DebugCurrentState()
@@ -310,7 +217,5 @@ FVector AMainPlayer::GetCameraWorldLocation()
 
 void AMainPlayer::OnMontageEndedCallback(UAnimMontage* Montage, bool bInterrupted)
 {
-	//! 여기에 절대 들어오면 안됨미닷
-	bIsAttacking = false;
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, TEXT("AMainPlayer::OnMontageEndedCallback()"));
 }
