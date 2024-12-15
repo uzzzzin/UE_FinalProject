@@ -26,6 +26,7 @@ void UMainPlayerIdleState::Update_Implementation(float DeltaTime)
 	if (0 < owner->GetVelocity().Size())
 	{
 		GetOwnerFSM()->ChangeState(FName("Move"));
+		return;
 	}
 }
 

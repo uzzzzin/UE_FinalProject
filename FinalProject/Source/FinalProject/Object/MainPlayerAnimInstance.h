@@ -14,12 +14,11 @@ class FINALPROJECT_API UMainPlayerAnimInstance : public UAnimInstance
 private:
 	FName prevState;
 
+	//FTimerHandle timer;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FName, bool> AnimStates; // State Name ¸ðÀ½.
-	float acc = 0.f;
-	float dura = 3.f;
-	bool test = false;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -62,6 +61,11 @@ public:
 	void AddMoveHorizontal(float _v);
 	UFUNCTION(BlueprintCallable, Category = "InputMove")
 	void AddMoveVertical(float _v);
+
+//! Notify Event
+public:
+	UFUNCTION()
+	void AnimNotify_EndMoveAttack();
 
 public:
 	virtual void NativeBeginPlay() override;

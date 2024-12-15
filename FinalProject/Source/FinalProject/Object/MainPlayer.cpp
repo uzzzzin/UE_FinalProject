@@ -8,7 +8,9 @@
 
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
+	, firstClick(false)
 	, bIsJumping(false)
+	, bIsAttacking(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -174,12 +176,26 @@ void AMainPlayer::MouseYaw(float _v)
 
 void AMainPlayer::Attack()
 {
+	if (false == firstClick)
+	{ 
+		// 언리얼 에디터에서 마우스 포커싱을 위해 첫 클릭을 해도 공격으로 인정되기 때문에, 
+		// 마우스 포커싱 후 첫 클릭을 유효 첫클릭으로 하기 위한 체크용 변수.
+		firstClick = true;
+		return;
+	}
+
+	if (false == bIsAttacking)
+	{
+		bIsAttacking = true;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "void AMainPlayer::Attack()");
+	}
 }
 
 void AMainPlayer::MyJump()
 {
 	Super::Jump();
 	bIsJumping = true;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "void AMainPlayer::MyJump()");
 }
 
 void AMainPlayer::Landed(const FHitResult& Hit)

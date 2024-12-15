@@ -122,3 +122,15 @@ void UMainPlayerAnimInstance::AddMoveVertical(float _v)
 		}
 	}
 }
+
+// ============================================== Notify Event ==========================================
+
+void UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()
+{
+	// 점프 끝내는 Notify에 들어왔으면 점프를 끝내야죠.
+	if (true == Cast<AMainPlayer>(TryGetPawnOwner())->GetIsAttacking()) // 점프중이에요.
+	{
+		//GetWorld()->GetTimerManager().SetTimer(timer, this, &UMainPlayerAnimInstance::, 3, false);
+		Cast<AMainPlayer>(TryGetPawnOwner())->SetIsAttacking(false);
+	}
+}

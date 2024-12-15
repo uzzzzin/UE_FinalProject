@@ -24,11 +24,13 @@ void UMainPlayerMoveJumpState::Update_Implementation(float DeltaTime)
 		if (0 >= owner->GetVelocity().Size())
 		{
 			GetOwnerFSM()->ChangeState(FName("Idle"));
+			return;
 		}
 		else // (0 < owner->GetVelocity().Size())
 		{
 			// MoveJump -> Move
 			GetOwnerFSM()->ChangeState(FName("Move"));
+			return;
 		}
 	}
 }

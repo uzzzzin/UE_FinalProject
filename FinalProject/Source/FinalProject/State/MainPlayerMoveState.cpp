@@ -24,12 +24,25 @@ void UMainPlayerMoveState::Update_Implementation(float DeltaTime)
 	if (0 >= owner->GetVelocity().Size())
 	{
 		GetOwnerFSM()->ChangeState(FName("Idle"));
+		return;
 	}
 
 	// Move -> MoveJump
 	if (true == owner->GetIsJumping())
 	{
 		GetOwnerFSM()->ChangeState(FName("MoveJump"));
+		return;
+	}
+
+	// Move -> MoveAttack
+	if (true == owner->GetIsAttacking())
+	{
+		GetOwnerFSM()->ChangeState(FName("MoveAttack"));
+		return;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "????????????????????");
 	}
 }
 

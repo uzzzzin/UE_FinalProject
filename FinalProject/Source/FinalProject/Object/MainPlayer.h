@@ -35,11 +35,16 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float DefaultMovementMaxWalkSpeed; // 기본 GetCharacterMovement()->MaxWalkSpeed
 
+	bool firstClick; // 언리얼 에디터에서 인게임 첫 클릭시에도 공격으로 인정되기 때문에 마우스 포커싱 후 첫 클릭을 유효 첫클릭으로 하기 위한 체크용 변수
+
 public: // for StateMachine
-	bool bIsJumping; // Jump State에서 사용하는 Jump 상태 변수
+	bool bIsJumping; // Jump 관련 State에서 사용하는 Jump 상태 변수
+	bool bIsAttacking; // Attack 관련 State에서 사용하는 Attack 상태 변수
 
 public:
 	bool GetIsJumping() { return bIsJumping; }
+	bool GetIsAttacking() { return bIsAttacking; }
+	void SetIsAttacking(bool _b) { bIsAttacking = _b; }
 public:
 	void MoveVertical(float _v); // 플레이어의 이동 함수들
 	void MoveHorizontal(float _v);
