@@ -67,7 +67,7 @@ void UMainPlayerFSM::FSM_Exit()
 
 void UMainPlayerFSM::SetAnimInstState(FName _prev, FName _key)
 {
-	Cast<UMainPlayerAnimInstance>(GetAnimInst())->SetOneAnimState(_key, false); // 이전의 것은 상태를 꺼줘요.
+	Cast<UMainPlayerAnimInstance>(GetAnimInst())->SetOneAnimState(_prev, false); // 이전의 것은 상태를 꺼줘요.
 	Cast<UMainPlayerAnimInstance>(GetAnimInst())->SetOneAnimState(_key, true); // 바뀔 상태는 켜줘요
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("( ChangeState() AnimState : %s ---> %s )"), *_prev.ToString(), *_key.ToString()));

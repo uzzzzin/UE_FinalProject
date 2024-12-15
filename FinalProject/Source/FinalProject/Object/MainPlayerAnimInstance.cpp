@@ -83,19 +83,20 @@ void UMainPlayerAnimInstance::AddMoveHorizontal(float _v)
 	}
 	else
 	{
-		if (InputMoveHorizontal >= 45.f)
+		if (InputMoveHorizontal >= 30.f)
 		{
-			InputMoveHorizontal = 45.f;
+			InputMoveHorizontal = 30.f;
 		}
-		else if(InputMoveHorizontal <= -45.f)
+		else if(InputMoveHorizontal <= -30.f)
 		{
-			InputMoveHorizontal = -45.f;
+			InputMoveHorizontal = -30.f;
 		}
 		else
 		{
 			InputMoveHorizontal += _v * 2; // 조금 더 빠른 값 누적을 위한
 		}
 	}
+
 }
 
 void UMainPlayerAnimInstance::AddMoveVertical(float _v)
@@ -107,13 +108,13 @@ void UMainPlayerAnimInstance::AddMoveVertical(float _v)
 	}
 	else
 	{
-		if (InputMoveVertical >= 20.f)
+		if (InputMoveVertical >= 10.f)
 		{
-			InputMoveVertical = 20.f;
+			InputMoveVertical = 10.f;
 		}
-		else if (InputMoveVertical <= -20.f)
+		else if (InputMoveVertical <= -10.f)
 		{
-			InputMoveVertical = -20.f;
+			InputMoveVertical = -10.f;
 		}
 		else
 		{
