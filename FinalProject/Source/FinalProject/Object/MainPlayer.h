@@ -35,7 +35,11 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float DefaultMovementMaxWalkSpeed; // 기본 GetCharacterMovement()->MaxWalkSpeed
 
+public: // for StateMachine
+	bool bIsJumping; // Jump State에서 사용하는 Jump 상태 변수
 
+public:
+	bool GetIsJumping() { return bIsJumping; }
 public:
 	void MoveVertical(float _v); // 플레이어의 이동 함수들
 	void MoveHorizontal(float _v);

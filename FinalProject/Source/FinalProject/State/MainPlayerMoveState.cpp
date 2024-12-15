@@ -20,9 +20,16 @@ void UMainPlayerMoveState::Update_Implementation(float DeltaTime)
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, "UMainPlayerMoveState::Update_Implementation()");
 
 	AMainPlayer* owner = Cast<AMainPlayer>(GetOwnerFSM()->GetOwnerStateMachine()->GetOwner());
+	// Move -> Idle
 	if (0 >= owner->GetVelocity().Size())
 	{
 		GetOwnerFSM()->ChangeState(FName("Idle"));
+	}
+
+	// Move -> MoveJump
+	if (true == owner->GetIsJumping())
+	{
+		GetOwnerFSM()->ChangeState(FName("MoveJump"));
 	}
 }
 

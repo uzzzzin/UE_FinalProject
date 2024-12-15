@@ -8,6 +8,7 @@
 
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
+	, bIsJumping(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -177,11 +178,19 @@ void AMainPlayer::Attack()
 
 void AMainPlayer::MyJump()
 {
+	Super::Jump();
+	bIsJumping = true;
 }
 
 void AMainPlayer::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
+
+	if (true == bIsJumping)
+	{
+		bIsJumping = false;
+	}
+	
 }
 
 void AMainPlayer::DebugCurrentState()
