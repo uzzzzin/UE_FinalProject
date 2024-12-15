@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/DataTable.h"
-#include "../FSM/BaseFSM.h"
+//#include "../FSM/BaseFSM.h"
 #include "StateMachineComponent.generated.h"
 
 USTRUCT(BlueprintType)
@@ -25,7 +25,7 @@ class FINALPROJECT_API UStateMachineComponent : public UActorComponent
 {
 	GENERATED_BODY()
 private:
-	TMap<FName, UBaseFSM*> StateMachines;
+	TMap<FName, class UBaseFSM*> StateMachines;
 	TArray<FName> FSMKeys; //키만 (중복없이)모아둘게요.
 	FName curFSMKey; //TODO: 키만 바뀌면 모든 걸 적용할 수 있게 구현하는 걸 목표로 해요.
 	UDataTable* FSMData; // DataTable
@@ -33,6 +33,7 @@ private:
 
 public:
 	TMap<FName, UBaseFSM*> GetStateMachines() { return StateMachines; }
+	FName GetCurFSMKey() { return curFSMKey; }
 	UBaseFSM* GetCurFSM() { return StateMachines[curFSMKey]; }
 	UBaseFSM* GetFSMByKey(FName _key) { return StateMachines[_key]; }
 	UDataTable* GetFSMData() { return FSMData; }

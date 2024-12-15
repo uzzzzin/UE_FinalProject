@@ -13,6 +13,8 @@ UCLASS()
 class FINALPROJECT_API UMainPlayerFSM : public UBaseFSM
 {
 	GENERATED_BODY()
+
+	virtual void SetAnimInstState(FName _prev, FName _key);
 	
 public:
 	virtual void Initialize() override;

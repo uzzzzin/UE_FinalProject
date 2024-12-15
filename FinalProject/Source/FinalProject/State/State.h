@@ -6,7 +6,6 @@
 #include "UObject/Interface.h"
 #include "State.generated.h"
 
-
 // This class does not need to be modified.
 UINTERFACE(Blueprintable)
 class UState : public UInterface

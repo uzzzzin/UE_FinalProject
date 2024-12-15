@@ -3,14 +3,59 @@
 #include "MainPlayerAnimInstance.h"
 #include "MainPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "../Component/StateMachineComponent.h"
+#include "../FSM/MainPlayerFSM.h"
 
 UMainPlayerAnimInstance::UMainPlayerAnimInstance()
 {
 }
 
+void UMainPlayerAnimInstance::NativeBeginPlay()
+{
+	Super::NativeBeginPlay();
+}
+
 void UMainPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	//FName curState = GetCurState();
+}
+
+bool UMainPlayerAnimInstance::GetOneAnimStateValue(FName _state)
+{
+		if (0 == AnimStates.Num())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FAIL : GetOneAnimStateValue() AnimStates are Not Init."));
+			return false;
+		}
+
+		else
+		{
+			if (true == AnimStates.Contains(_state))
+				return AnimStates[_state];
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("FAIL : GetOneAnimStateValue() ---> %s"), *_state.ToString()));
+				return false;
+			}
+		}
+}
+
+FName UMainPlayerAnimInstance::GetCurState()
+{
+	// AnimInstance는 순회를 하면서 현재 true인 상태를 찾아줘요.
+	//! true인 상태 == 현재 진행중인 State
+
+	for (const TPair<FName, bool>& s : AnimStates)
+	{
+		if (true == s.Value) // bool 값이 true일 때만 실행
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("GetCurState() : %s"), *(s.Key).ToString()));
+			return s.Key;
+		}
+	}
+	return FName(); // IsNone()으로 값 확인?
 }
 
 void UMainPlayerAnimInstance::AddMouseYaw(float _v)

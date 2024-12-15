@@ -1,6 +1,7 @@
 
 #include "StateMachineComponent.h"
-
+#include "GameFramework/Character.h"
+#include "../FSM/BaseFSM.h"
 
 UStateMachineComponent::UStateMachineComponent()
 	: FSMDataPath(TEXT(""))
@@ -94,6 +95,7 @@ void UStateMachineComponent::LoadFSMData(const FString& FilePath)
 				if (nullptr != FoundFSM && false == StateMachines.Contains(className))
 				{
 					StateMachines.Add(className, FoundFSM); // StateMachin[FSM Key, FSM ptr]
+					FoundFSM->SetOwnerStateMachine(this); // FSM의 오너를 this(== SM Component)로 설정해줘요.
 				}
 				else // FSM을 못 만들었네요? 리턴.
 				{

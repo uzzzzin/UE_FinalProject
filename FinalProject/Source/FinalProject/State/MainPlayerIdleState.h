@@ -13,17 +13,10 @@ UCLASS()
 class FINALPROJECT_API UMainPlayerIdleState : public UObject, public IState
 {
 	GENERATED_BODY()
-
 public:
-	FTimerHandle testTimer;
-
-public:
-	bool test = false;
-	bool prev = false;
-
-	float duration = 2.f;
 	float acc = 0.f;
-
+	float dura = 3.f;
+	bool test = false;
 	
 public:
 	virtual void Enter_Implementation() override;

@@ -11,6 +11,16 @@ class FINALPROJECT_API UMainPlayerAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
+private:
+	FName prevState;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<FName, bool> AnimStates; // State Name 모음.
+	float acc = 0.f;
+	float dura = 3.f;
+	bool test = false;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InputMouseYaw;
@@ -24,6 +34,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InputMoveVertical; // ~45, +45, BS 값 조절
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "StateMachine")
+	TMap<FName, bool> GetAnimStates() { return AnimStates; }
+	void SetAnimStates(TMap<FName, bool> _map) { AnimStates = _map; }
+
+	void SetOneAnimState(FName _state, bool _b) { AnimStates[_state] = _b; }
+
+	UFUNCTION(BlueprintCallable, Category = "StateMachine")
+	bool GetOneAnimStateValue(FName _state);
+
+	FName GetPrevState() { return prevState; }
+	void SetPrevState(FName _state) { prevState = _state; }
+	
+	FName GetCurState();
 public:
 	UFUNCTION(BlueprintCallable, Category = "InputMouse")
 	void AddMouseYaw(float _v);
@@ -40,6 +64,7 @@ public:
 	void AddMoveVertical(float _v);
 
 public:
+	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	UMainPlayerAnimInstance();
 };

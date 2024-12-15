@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BaseFSM.h"
+#include "../Component/StateMachineComponent.h"
 
 UBaseFSM::UBaseFSM()
 {
@@ -10,6 +11,9 @@ void UBaseFSM::FSM_Begin()
 {
     // States 맵 순회하고 State들의 Owner를 this로 세팅해주세요.
     States[curStateName]->Enter_Implementation();
+
+    // 상속한 자식에서 무조건 초기화해줘요
+    //animInst = GetOwnerStateMachine()->GetOwner()->GetMesh()->GetAnimInstance());
 }
 
 void UBaseFSM::FSM_Tick(float DeltaTime)
@@ -50,6 +54,34 @@ FName UBaseFSM::GetStateNameByStateValue(IState* _value)
     // 키를 찾지 못했어요.
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FAIL : UBaseFSM::GetStateNameByStateValue()"));
     return FName(); // IsNone()으로 체크 가능!!
+}
+
+void UBaseFSM::ChangeState(FName _key)
+{
+	FName prevStateName = curStateName;
+
+	// 1. 현재 State -> Exit
+	// 2. 전환될 State ->Exter
+	// 3. 현재 StateName -> 전환될 StateName
+    if (nullptr != States[_key])
+    {
+	    States[curStateName]->Exit_Implementation();
+	    curStateName = _key;
+	    States[curStateName]->Enter_Implementation();
+	    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("( ChangeState() %s ---> %s  )"), *prevStateName.ToString(), *curStateName.ToString()));
+
+        SetAnimInstState(prevStateName, _key);
+    }
+    else
+    {
+	    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("( FAIL : ChangeState() %s ---> %s  )"), *prevStateName.ToString(), *curStateName.ToString()));
+    }
+}
+
+void UBaseFSM::SetAnimInstState(FName _prev, FName _key)
+{
+    // 자식에서 각각 꼭 처리해주세요 우진씨 까먹지 말고 우진아 까먹지 마라 제발 지짜
+    // ChangeState 할 떄 실행되는 함수예요.
 }
 
 //void UBaseFSM::ChangeState(FName _key)

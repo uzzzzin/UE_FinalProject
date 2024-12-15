@@ -16,50 +16,58 @@ class FINALPROJECT_API UBaseFSM : public UObject
 	GENERATED_BODY()
 	
 private:
+	class UStateMachineComponent* OwnerComponent; // 내가 지금 누구 소속이게.
 	TMap<FName, IState*> States; // State들을 저장해둔 곳. Key-StateName, Value-StatePointer(IState)
 	TArray<FName> StateKeys; // 키만 중복없이 모아둘게요.
 	FName curStateName; // 현재State의 Name. Key를 들고 있는 게 편함.
 
+	UAnimInstance* animInst; // animInst의 것들도 호환시킬 거니까 들고 있어요.
+
 public:
+	void SetOwnerStateMachine(class UStateMachineComponent* _SM) { OwnerComponent = _SM; }
+	class UStateMachineComponent* GetOwnerStateMachine() { return OwnerComponent; }
 	TMap<FName, IState*>& GetStates() { return States; }
 	TArray<FName>& GetStateKeys() { return StateKeys; }
 	FName GetCurStateName() { return curStateName;  };
+	IState* GetCurState() { return States[curStateName]; }
 	void SetCurStateName(FName _name) { curStateName = _name; }
-
 	FName GetStateNameByStateValue(IState* _stateValue); // States->Value로 Key 찾기
 
+	void ChangeState(FName _key);
+	virtual void SetAnimInstState(FName _prev, FName _key);
+
+	void SetAnimInst(UAnimInstance* _inst) { animInst = _inst; }
+	UAnimInstance* GetAnimInst() { return animInst; }
 public:
-	//void ChangeState(FName _key);
 	//! 템플릿으로 구현된 함수들.
 	// void ChangeState(FName _key); 
 	// T* FindState(Fname _key);
 	// void AddState(FName _key);
 
-	template<typename T>
-	inline void ChangeState(FName _key) // Key를 받아야 하는 이유는, T 타입의 State가 여러개일 수 있고, 그걸 Key로 구분해야 하니까.
-	{
-		T* tmpState = FindState<T>(_key);
+	//template<typename T>
+	//inline void ChangeState(FName _key) // Key를 받아야 하는 이유는, T 타입의 State가 여러개일 수 있고, 그걸 Key로 구분해야 하니까.
+	//{
+	//	T* tmpState = FindState<T>(_key);
+	//	FName prevStateName = curStateName;
 
-		//if (nullptr == FindState<T>(_key))
-		if (nullptr == tmpState)
-		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("( FAIL : FindState() ---> %s  )"), *_key.ToString()));
-			ChangeState<T>(curStateName); // 바꿀 State가 없는 State라면 현재 State를 다시 실행해요
-			return;
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("( SUCCESS : FindState() ---> %s )"), *_key.ToString()));
+	//	//if (nullptr == FindState<T>(_key))
+	//	if (nullptr == tmpState)
+	//	{
+	//		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("( FAIL : FindState() ---> %s  )"), *_key.ToString()));
+	//		ChangeState<T>(curStateName); // 바꿀 State가 없는 State라면 현재 State를 다시 실행해요
+	//	}
+	//	else
+	//	{
+	//		// 1. 현재 State -> Exit
+	//		// 2. 전환될 State ->Exter
+	//		// 3. 현재 StateName -> 전환될 StateName
+	//		States[curStateName]->Exit_Implementation();
+	//		curStateName = _key;
+	//		States[curStateName]->Enter_Implementation();
 
-			// 1. 현재 State -> Exit
-			// 2. 전환될 State ->Exter
-			// 3. 현재 StateName -> 전환될 StateName
-			States[curStateName]->Exit_Implementation();
-			curStateName = _key;
-			States[curStateName]->Enter_Implementation();
-		}
-	}
-
+	//	}
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("( ChangeState() %s ---> %s  )"), *prevStateName.ToString(), *curStateName.ToString()));
+	//}
 
 	template<typename T>
 	inline T* FindState(FName _key)
