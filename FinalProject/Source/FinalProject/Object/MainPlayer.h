@@ -40,11 +40,17 @@ public:
 public: // for StateMachine
 	bool bIsJumping; // Jump 관련 State에서 사용하는 Jump 상태 변수
 	bool bIsAttacking; // Attack 관련 State에서 사용하는 Attack 상태 변수
+	bool bIsSiuuuuAttacking; // Jump중일 떄 Attack 은 킹갓Siuuuu Attack
 
 public:
 	bool GetIsJumping() { return bIsJumping; }
+
 	bool GetIsAttacking() { return bIsAttacking; }
 	void SetIsAttacking(bool _b) { bIsAttacking = _b; }
+
+	bool GetIsSiuuuuAttacking() { return bIsSiuuuuAttacking; }
+	void SetIsSiuuuuAttacking(bool _b) { bIsSiuuuuAttacking = _b; }
+
 public:
 	void MoveVertical(float _v); // 플레이어의 이동 함수들
 	void MoveHorizontal(float _v);

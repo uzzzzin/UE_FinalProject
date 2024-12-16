@@ -130,7 +130,17 @@ void UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()
 	// 점프 끝내는 Notify에 들어왔으면 점프를 끝내야죠.
 	if (true == Cast<AMainPlayer>(TryGetPawnOwner())->GetIsAttacking()) // 점프중이에요.
 	{
-		//GetWorld()->GetTimerManager().SetTimer(timer, this, &UMainPlayerAnimInstance::, 3, false);
 		Cast<AMainPlayer>(TryGetPawnOwner())->SetIsAttacking(false);
+	}
+}
+
+void UMainPlayerAnimInstance::AnimNotify_EndSiuuuuAttack()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "UMainPlayerAnimInstance::AnimNotify_EndSiuuuuAttack()");
+
+	// SiuuuuAttack 끝내는 Notify에 들어왔으면 SiuuuuAttack을 끝내야죠.
+	if (true == Cast<AMainPlayer>(TryGetPawnOwner())->GetIsSiuuuuAttacking()) // SiuuuuAttack중이에요.
+	{
+		Cast<AMainPlayer>(TryGetPawnOwner())->SetIsSiuuuuAttacking(false);
 	}
 }

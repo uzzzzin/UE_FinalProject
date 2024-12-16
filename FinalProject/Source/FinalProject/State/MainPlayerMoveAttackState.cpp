@@ -23,18 +23,6 @@ void UMainPlayerMoveAttackState::Update_Implementation(float DeltaTime)
 	{
 		// MoveAttack -> PostMoveAttack
 		GetOwnerFSM()->ChangeState(FName("PostMoveAttack"));
-		//// MoveAttack -> Idle
-		//if (0 >= owner->GetVelocity().Size())
-		//{
-		//	GetOwnerFSM()->ChangeState(FName("Idle"));
-		//	return;
-		//}
-		//else // (0 < owner->GetVelocity().Size())
-		//{
-		//	// MoveAttack -> Move
-		//	GetOwnerFSM()->ChangeState(FName("Move"));
-		//	return;
-		//}
 	}
 
 }
@@ -42,4 +30,3 @@ void UMainPlayerMoveAttackState::Update_Implementation(float DeltaTime)
 void UMainPlayerMoveAttackState::Exit_Implementation()
 {
 }
-

@@ -184,10 +184,19 @@ void AMainPlayer::Attack()
 		return;
 	}
 
-	if (false == bIsAttacking)
+	if (false == bIsAttacking) // 공격중이 아닐 때만 공격을 해야 해요.
 	{
 		bIsAttacking = true;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "void AMainPlayer::Attack()");
+	}
+
+	if (true == bIsJumping) // 점프중일 때는 공격이 씹혀야 해요.
+	{// TODO: 지금은 점프중일 떄는 공격이 씹히지만
+		// TODO: 추후에 점프중일 떄 하는 Siuuuu공격을 추가하면
+		// TODO: Siuuuu공격만 활성활 할 수 있도록 한다.
+		bIsAttacking = false;
+		bIsSiuuuuAttacking = true;
+		return;
 	}
 }
 
@@ -202,7 +211,7 @@ void AMainPlayer::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 
-	if (true == bIsJumping)
+	if (true == bIsJumping) // 땅에 착지했다면 점푸중이 아니에요.
 	{
 		bIsJumping = false;
 	}

@@ -67,6 +67,9 @@ public:
 	UFUNCTION()
 	void AnimNotify_EndMoveAttack();
 
+	UFUNCTION()
+	void AnimNotify_EndSiuuuuAttack();
+
 public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
