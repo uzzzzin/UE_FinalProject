@@ -23,10 +23,20 @@ void UStateMachineComponent::BeginPlay()
 void UStateMachineComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (true == StateMachines.Contains(curFSMKey) && nullptr != StateMachines[curFSMKey]) // StateMachines에 들어있고, nullptr이 아니라면
+	//if (curFSMKey.IsNone())
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("( curFSMKey Is None : ---> %s )"), *curFSMKey.ToString()));
+	//	return;
+	//}
+	if (0 == StateMachines.Num())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT(" 0 == StateMachines.Num()"), *curFSMKey.ToString()));
+		return;
+	}
+	if (false == curFSMKey.IsNone() && true == StateMachines.Contains(curFSMKey) && nullptr != StateMachines[curFSMKey]) // StateMachines에 들어있고, nullptr이 아니라면
 	{
 		StateMachines[curFSMKey]->FSM_Tick(DeltaTime);
+		return;
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("(UStateMachineComponent::Tick() ---> %s )"), *curFSMKey.ToString()));
 	}
 	else

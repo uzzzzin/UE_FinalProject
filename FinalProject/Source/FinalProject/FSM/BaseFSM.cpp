@@ -18,7 +18,7 @@ void UBaseFSM::FSM_Begin()
 
 void UBaseFSM::FSM_Tick(float DeltaTime)
 {
-	if (nullptr == States[curStateName])
+	if (curStateName.IsNone() || false == States.Contains(curStateName) || nullptr == States[curStateName])
 	{
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("( FAIL : FSM::FSM_Tick ---> %s )"), *curStateName.ToString()));
         return;
