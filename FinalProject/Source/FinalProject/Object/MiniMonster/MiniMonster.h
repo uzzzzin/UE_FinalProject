@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TSubclassOf<UAnimInstance> AnimInstanceBP;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StateMachine")
+	class UStateMachineComponent* SM;
+
 public:
 	void SetRandomMaterial(); // 랜덤으로 머터리얼을 배정할 거예요.
 

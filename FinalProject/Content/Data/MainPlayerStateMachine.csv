@@ -1,0 +1,8 @@
+key,FSM,State
+0,MainPlayer,Idle
+1,MainPlayer,Move
+2,MainPlayer,MoveJump
+3,MainPlayer,MoveAttack
+4,MainPlayer,PostMoveAttack
+5,MainPlayer,SiuuuuAttack
+6,MainPlayer,PostSiuuuuAttack

@@ -3,6 +3,8 @@
 #include "MiniMonster.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "../../Component/StateMachineComponent.h"
+#include "MiniMonsterAIController.h"
 
 // Sets default values
 AMiniMonster::AMiniMonster()
@@ -29,6 +31,15 @@ AMiniMonster::AMiniMonster()
 	{
 		AnimInstanceBP = AnimBPClass.Class;
 	}
+
+	//! AI Controller 설정
+	AIControllerClass = AMiniMonsterAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; // 이 클래스 가진 몬스터는 무조건 다 제어하겠어요.
+
+	//! State Machine 설정
+	SM = CreateDefaultSubobject<UStateMachineComponent>(TEXT("SM"));
+	SM->SetFSMDataPath(TEXT("/Script/Engine.DataTable'/Game/Data/MiniMonsterStateMachine.MiniMonsterStateMachine'"));
+
 }
 
 void AMiniMonster::SetRandomMaterial()
@@ -106,6 +117,14 @@ void AMiniMonster::PostInitializeComponents()
 	if (GetMesh())
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceBP);
+	}
+
+	//! StateMachine CSV 데이터 불러오기.
+	SM->LoadFSMData(TEXT("/Script/Engine.DataTable'/Game/Data/MiniMonsterStateMachine.MiniMonsterStateMachine'"));
+
+	if (nullptr == SM->GetFSMData())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("( FAIL : PostInitializeComponents() FSMData is Nullptr. )"));
 	}
 }
 
