@@ -15,6 +15,8 @@ class FINALPROJECT_API UMiniMonsterFSM : public UBaseFSM
 	GENERATED_BODY()
 	
 public:
+	virtual void SetAnimInstState(FName _prev, FName _key);
+public:
 	virtual void Initialize() override;
 	virtual void FSM_Begin() override;
 	virtual void FSM_Tick(float DeltaTime) override;

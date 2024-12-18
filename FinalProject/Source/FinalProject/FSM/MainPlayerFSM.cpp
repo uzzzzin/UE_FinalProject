@@ -67,6 +67,7 @@ void UMainPlayerFSM::FSM_Exit()
 
 void UMainPlayerFSM::SetAnimInstState(FName _prev, FName _key)
 {
+	// ChangeState 할 때 실행되는 함수예요.
 	Cast<UMainPlayerAnimInstance>(GetAnimInst())->SetOneAnimState(_prev, false); // 이전의 것은 상태를 꺼줘요.
 	Cast<UMainPlayerAnimInstance>(GetAnimInst())->SetOneAnimState(_key, true); // 바뀔 상태는 켜줘요
 

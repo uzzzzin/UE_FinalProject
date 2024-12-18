@@ -14,6 +14,11 @@ class FINALPROJECT_API UMiniMonsterIdleState : public UObject, public IState
 {
 	GENERATED_BODY()
 
+private:
+	bool test = false;
+	float acc = 0.f;
+	float dura = 2.f;
+
 public:
 	virtual void Enter_Implementation() override;
 	virtual void Update_Implementation(float DeltaTime) override;
