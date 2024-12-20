@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "State.h"
-#include "MiniMonsterIdleState.generated.h"
+#include "MiniMonsterPatrolState.generated.h"
 /**
  * 
  */
 UCLASS()
-class FINALPROJECT_API UMiniMonsterIdleState : public UObject, public IState
+class FINALPROJECT_API UMiniMonsterPatrolState : public UObject, public IState
 {
 	GENERATED_BODY()
-
+	
 private:
-	bool test = false;
-	float acc = 0.f;
-	float dura = 0.5f;
+	FTimerHandle repeatTimer; // 반복해서 돌릴 타이머
+	float speed; // 전진 속도?
+	float rotSpeed; // 회전 속도
 
 public:
 	virtual void Enter_Implementation() override;
@@ -25,5 +25,5 @@ public:
 	virtual void Exit_Implementation() override;
 
 public:
-	UMiniMonsterIdleState();
+	UMiniMonsterPatrolState();
 };

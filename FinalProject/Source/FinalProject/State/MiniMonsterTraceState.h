@@ -5,25 +5,20 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "State.h"
-#include "MiniMonsterIdleState.generated.h"
+#include "MiniMonsterTraceState.generated.h"
 /**
  * 
  */
 UCLASS()
-class FINALPROJECT_API UMiniMonsterIdleState : public UObject, public IState
+class FINALPROJECT_API UMiniMonsterTraceState : public UObject, public IState
 {
 	GENERATED_BODY()
-
-private:
-	bool test = false;
-	float acc = 0.f;
-	float dura = 0.5f;
-
+	
 public:
 	virtual void Enter_Implementation() override;
 	virtual void Update_Implementation(float DeltaTime) override;
 	virtual void Exit_Implementation() override;
 
 public:
-	UMiniMonsterIdleState();
+	UMiniMonsterTraceState();
 };

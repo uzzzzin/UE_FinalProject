@@ -1,3 +1,5 @@
 ﻿key,FSM,State
 0,MiniMonster,Idle
-1,MiniMonster,Move
+1,MiniMonster,Patrol
+2,MiniMonster,Attack
+3,MiniMonster,Trace

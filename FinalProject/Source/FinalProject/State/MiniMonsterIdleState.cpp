@@ -21,8 +21,10 @@ void UMiniMonsterIdleState::Update_Implementation(float DeltaTime)
 		if (acc >= dura)
 		{
 			test = true;
-			// ChangeState
-			GetOwnerFSM()->ChangeState(FName("Move"));
+			// Idle -> Patrol
+			// 무조건 Idle은 시작인 게 좋을 것 같아요.
+			// 기본이 Patrol
+			GetOwnerFSM()->ChangeState(FName("Patrol"));
 		}
 		else
 		{

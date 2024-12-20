@@ -100,7 +100,6 @@ void AMiniMonster::BeginPlay()
 void AMiniMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AMiniMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
