@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "FSM/MainPlayerFSM.h"
+#include "UI/MainPlayerUserWidget.h"
 
 UReMainPlayerPostMoveAttackState::UReMainPlayerPostMoveAttackState()
 	: accTime(0.f)
@@ -30,6 +31,8 @@ void UReMainPlayerPostMoveAttackState::Update(float DeltaTime)
 	if (accTime > duration) // Delay 시간이 끝나면
 	{
 		owner->GetCharacterMovement()->SetMovementMode(MOVE_Walking); // 플레이어 이동을 다시 활성화해요.
+
+		owner->WidgetInstance->RecoveryQSkillImage(); // UI도 되돌려야해요.
 
 		// PostMoveAttack -> Idle
 		if (0 >= owner->GetVelocity().Size())

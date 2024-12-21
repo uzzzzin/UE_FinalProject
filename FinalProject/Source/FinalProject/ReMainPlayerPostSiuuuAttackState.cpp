@@ -7,6 +7,8 @@
 #include "Object/MainPlayerAnimInstance.h"
 #include "FSM/MainPlayerFSM.h"
 
+#include "UI/MainPlayerUserWidget.h"
+
 UReMainPlayerPostSiuuuAttackState::UReMainPlayerPostSiuuuAttackState()
 	: accTime(0.f)
 	, duration(0.2f)
@@ -27,6 +29,8 @@ void UReMainPlayerPostSiuuuAttackState::Update(float DeltaTime)
 	if (accTime > duration) // Delay 시간이 끝나면
 	{
 		//owner->GetCharacterMovement()->SetMovementMode(MOVE_Walking); // 플레이어 이동을 다시 활성화해요.
+
+		owner->WidgetInstance->RecoveryESkillImage(); // UI도 되돌려야해요.
 
 		// PostSiuuuuAttack -> Idle
 		if (0 >= owner->GetVelocity().Size())
