@@ -133,7 +133,7 @@ void UStateMachineComponent::LoadFSMData(const FString& FilePath)
 					// 그럼 State 객체 만들어서 넣어줘요.
 					FString stateName = Row->State;
 					//FString stateClassName = FString::Printf(TEXT("%s%sState"), *FSMKey.ToString(), *stateName); //! State 클래스명 규칙 : FSM Key + State Key + 'State'
-					FString StateClassPath = FString::Printf(TEXT("/Script/FinalProject.%s%sState"), *FSMKey.ToString(), *stateName); // 클래스 이름을 전체 경로로 변환시켜요.
+					FString StateClassPath = FString::Printf(TEXT("/Script/FinalProject.Re%s%sState"), *FSMKey.ToString(), *stateName); // 클래스 이름을 전체 경로로 변환시켜요.
 					UClass* FoundClass = LoadClass<UObject>(nullptr, *StateClassPath); // 클래스 소환했습니닷.
 
 					if (!FoundClass) // State 클래스 못 찾았어여. 없는듯여. 리턴.
@@ -155,8 +155,8 @@ void UStateMachineComponent::LoadFSMData(const FString& FilePath)
 							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "FAIL :holyShirrttttttttt");
 
 						}
-						StateMachines[FName(Row->FSM)]->GetStates().Add(FName(stateName), Cast<IState>(FoundState)); // States[State Key, State ptr]
-						Cast<IState>(FoundState)->SetOwnerFSM(StateMachines[FName(Row->FSM)]); // 현재 State의 Owner를 FSM으로 지정해줬어요.
+						StateMachines[FName(Row->FSM)]->GetStates().Add(FName(stateName), Cast<UBaseState>(FoundState)); // States[State Key, State ptr]
+						Cast<UBaseState>(FoundState)->SetOwnerFSM(StateMachines[FName(Row->FSM)]); // 현재 State의 Owner를 FSM으로 지정해줬어요.
 					}
 					else // FSM을 못 만들었네요? 리턴.
 					{

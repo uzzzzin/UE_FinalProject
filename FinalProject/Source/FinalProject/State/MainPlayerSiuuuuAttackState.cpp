@@ -21,7 +21,7 @@ void UMainPlayerSiuuuuAttackState::Update_Implementation(float DeltaTime)
 	// SiuuuuAttack -> PostSiuuuuAttack
 	if (false == owner->GetIsSiuuuuAttacking())
 	{
-		GetOwnerFSM()->ChangeState(FName("PostSiuuuuAttack"));
+		GetOwnerFSM()->ChangeState(FName("PostSiuuuAttack"));
 
 	}
 }

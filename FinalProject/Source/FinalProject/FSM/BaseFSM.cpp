@@ -10,7 +10,7 @@ UBaseFSM::UBaseFSM()
 void UBaseFSM::FSM_Begin()
 {
     // States 맵 순회하고 State들의 Owner를 this로 세팅해주세요.
-    States[curStateName]->Enter_Implementation();
+    States[curStateName]->Enter();
 
     // 상속한 자식에서 무조건 초기화해줘요
     //animInst = GetOwnerStateMachine()->GetOwner()->GetMesh()->GetAnimInstance());
@@ -25,7 +25,7 @@ void UBaseFSM::FSM_Tick(float DeltaTime)
 	}
     else
     {
-		States[curStateName]->Update_Implementation(DeltaTime); // 현재 State의 틱도 돌려줘야지요.
+		States[curStateName]->Update(DeltaTime); // 현재 State의 틱도 돌려줘야지요.
         //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("(FSM::FSM_Tick ---> %s )"), *curStateName.ToString()));
     }
 }
@@ -41,7 +41,7 @@ void UBaseFSM::Initialize()
     // 자식들은 여기서 State들을 추가하거나 초기 세팅을 할 거예요.
 }
 
-FName UBaseFSM::GetStateNameByStateValue(IState* _value)
+FName UBaseFSM::GetStateNameByStateValue(UBaseState* _value)
 {
     for (const auto& pair : States)
     {
@@ -65,9 +65,9 @@ void UBaseFSM::ChangeState(FName _key)
 	// 3. 현재 StateName -> 전환될 StateName
     if (nullptr != States[_key])
     {
-	    States[curStateName]->Exit_Implementation();
+	    States[curStateName]->Exit();
 	    curStateName = _key;
-	    States[curStateName]->Enter_Implementation();
+	    States[curStateName]->Enter();
 	    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("( ChangeState() %s ---> %s  )"), *prevStateName.ToString(), *curStateName.ToString()));
 
         SetAnimInstState(prevStateName, _key);

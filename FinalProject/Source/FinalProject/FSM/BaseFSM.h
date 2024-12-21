@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "../State/State.h"
+#include "../State/BaseState.h"
 #include "BaseFSM.generated.h"
 
 /**
@@ -17,7 +17,7 @@ class FINALPROJECT_API UBaseFSM : public UObject
 	
 private:
 	class UStateMachineComponent* OwnerComponent; // 내가 지금 누구 소속이게.
-	TMap<FName, IState*> States; // State들을 저장해둔 곳. Key-StateName, Value-StatePointer(IState)
+	TMap<FName, UBaseState*> States; // State들을 저장해둔 곳. Key-StateName, Value-StatePointer(IState)
 	TArray<FName> StateKeys; // 키만 중복없이 모아둘게요.
 	FName curStateName; // 현재State의 Name. Key를 들고 있는 게 편함.
 
@@ -26,12 +26,12 @@ private:
 public:
 	void SetOwnerStateMachine(class UStateMachineComponent* _SM) { OwnerComponent = _SM; }
 	class UStateMachineComponent* GetOwnerStateMachine() { return OwnerComponent; }
-	TMap<FName, IState*>& GetStates() { return States; }
+	TMap<FName, UBaseState*>& GetStates() { return States; }
 	TArray<FName>& GetStateKeys() { return StateKeys; }
 	FName GetCurStateName() { return curStateName;  };
-	IState* GetCurState() { return States[curStateName]; }
+	UBaseState* GetCurState() { return States[curStateName]; }
 	void SetCurStateName(FName _name) { curStateName = _name; }
-	FName GetStateNameByStateValue(IState* _stateValue); // States->Value로 Key 찾기
+	FName GetStateNameByStateValue(UBaseState* _stateValue); // States->Value로 Key 찾기
 
 	void ChangeState(FName _key);
 	virtual void SetAnimInstState(FName _prev, FName _key);
