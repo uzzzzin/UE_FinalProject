@@ -30,6 +30,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UStateMachineComponent* SM;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UMainPlayerUserWidget> WidgetClass; // 블루프린트에서 설정할 위젯 클래스
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "UI")
+	UMainPlayerUserWidget* WidgetInstance; // 생성된 위젯 인스턴스
+
 	bool bControlSpringArmYawOnly; // 디버깅용, Player움직임이 아닌 카메라의 움직임만 제어하고 싶을 때.
 
 	UPROPERTY(BlueprintReadOnly)

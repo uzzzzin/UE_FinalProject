@@ -5,6 +5,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../Component/StateMachineComponent.h"
 #include "MainPlayerAnimInstance.h"
+#include "Components/WidgetComponent.h"
+#include "../UI/MainPlayerUserWidget.h"
 
 AMainPlayer::AMainPlayer()
 	: bControlSpringArmYawOnly(false)
@@ -59,6 +61,14 @@ AMainPlayer::AMainPlayer()
 	{
 		AttackMontage = montage.Object;
 	}
+
+	//! UserWidgetClass를 블루프린트 경로에서 로드
+		// 위젯 클래스 설정
+	static ConstructorHelpers::FClassFinder<UMainPlayerUserWidget> WidgetBPClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/BP_MainPlayerUI.BP_MainPlayerUI_C'"));
+	if (WidgetBPClass.Class != nullptr)
+	{
+		WidgetClass = WidgetBPClass.Class;
+	}
 }
 
 void AMainPlayer::BeginPlay()
@@ -74,6 +84,20 @@ void AMainPlayer::BeginPlay()
 
 	//! DefaultMovementMaxWalkSpeed 세팅
 	DefaultMovementMaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
+	//! Widget 세팅
+	if (WidgetClass)
+	{
+		WidgetInstance = CreateWidget<UMainPlayerUserWidget>(GetWorld(), WidgetClass);
+		if (WidgetInstance)
+		{
+			WidgetInstance->AddToViewport();
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "Widget Class Is not Set....");
+	}
 }
 
 void AMainPlayer::Tick(float DeltaTime)
@@ -239,6 +263,7 @@ void AMainPlayer::QAttack()
 	if (false == bIsQAttacking && false == bIsJumping && false == bIsAttacking && false == bIsSiuuuuAttacking)
 	{
 		bIsQAttacking = true;
+		WidgetInstance->HighlightQSkillImage();
 	}
 }
 
@@ -247,6 +272,7 @@ void AMainPlayer::EAttack()
 	if (false == bIsSiuuuuAttacking && false == bIsJumping && false == bIsAttacking && false == bIsQAttacking)
 	{
 		bIsSiuuuuAttacking = true;
+		WidgetInstance->HighlightESkillImage();
 	}
 }
 
