@@ -28,7 +28,7 @@ AMainPlayer::AMainPlayer()
 	//! Spring Arm Componet 설정
 	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	springArm->SetupAttachment(RootComponent);
-	springArm->TargetArmLength = 600.f;
+	springArm->TargetArmLength = 700.f;
 	springArm->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
 	springArm->bDoCollisionTest = false; // 충돌 시, 줌인효과 false
 

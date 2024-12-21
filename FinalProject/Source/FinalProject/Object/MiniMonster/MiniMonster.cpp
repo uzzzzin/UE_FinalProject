@@ -20,7 +20,7 @@ AMiniMonster::AMiniMonster()
 	if (MeshAsset.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(MeshAsset.Object);
-		GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -88.f)); // 캡슐 세로 반경만큼 메시 이동.
+		GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -108.f)); // 캡슐 세로 반경만큼 메시 이동.
 		GetMesh()->SetRelativeRotation(FRotator(0, 90.f, 0.f));
 		GetMesh()->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
 	}
@@ -33,8 +33,8 @@ AMiniMonster::AMiniMonster()
 	}
 
 	//! AI Controller 설정
-	AIControllerClass = AMiniMonsterAIController::StaticClass();
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; // 이 클래스 가진 몬스터는 무조건 다 제어하겠어요.
+	//AIControllerClass = AMiniMonsterAIController::StaticClass();
+	//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned; // 이 클래스 가진 몬스터는 무조건 다 제어하겠어요.
 
 	//! State Machine 설정
 	SM = CreateDefaultSubobject<UStateMachineComponent>(TEXT("SM"));
