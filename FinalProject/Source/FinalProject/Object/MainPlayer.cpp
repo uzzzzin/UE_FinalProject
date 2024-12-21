@@ -11,6 +11,8 @@ AMainPlayer::AMainPlayer()
 	, firstClick(false)
 	, bIsJumping(false)
 	, bIsAttacking(false)
+	, bIsSiuuuuAttacking(false)
+	, bIsQAttacking(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
@@ -50,6 +52,13 @@ AMainPlayer::AMainPlayer()
 
 	//! 마우스로 제어하는 시야 세팅
 	bUseControllerRotationPitch = true; // 무브먼트 이용해서 Pitch Rotation 가능하도록 설정.
+
+	//! Attack Montage 세팅
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> montage(TEXT("/Script/Engine.AnimMontage'/Game/Player/AM_MainPlayer_Attack_Pole.AM_MainPlayer_Attack_Pole'"));
+	if (montage.Succeeded())
+	{
+		AttackMontage = montage.Object;
+	}
 }
 
 void AMainPlayer::BeginPlay()
@@ -85,6 +94,8 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis(TEXT("MoveHorizontal"), this, &AMainPlayer::MoveHorizontal); // A, D 
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &AMainPlayer::Attack); // 마우스 좌클릭
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AMainPlayer::MyJump); // 스페이스바
+	PlayerInputComponent->BindAction(TEXT("JumpAttack"), EInputEvent::IE_Pressed, this, &AMainPlayer::QAttack); // 스페이스바
+	PlayerInputComponent->BindAction(TEXT("SiuuuuAttack"), EInputEvent::IE_Pressed, this, &AMainPlayer::EAttack); // 스페이스바
 
 	// Debug Input
 	// 마우스로 시점 전환할 때 LShift 누르면 플레이어의 방향벡터는 마우스 화면을 안 따라가도록 할건데 그걸 키고 끌 변수.
@@ -191,11 +202,8 @@ void AMainPlayer::Attack()
 	}
 
 	if (true == bIsJumping) // 점프중일 때는 공격이 씹혀야 해요.
-	{// TODO: 지금은 점프중일 떄는 공격이 씹히지만
-		// TODO: 추후에 점프중일 떄 하는 Siuuuu공격을 추가하면
-		// TODO: Siuuuu공격만 활성활 할 수 있도록 한다.
+	{
 		bIsAttacking = false;
-		bIsSiuuuuAttacking = true;
 		return;
 	}
 }
@@ -203,8 +211,16 @@ void AMainPlayer::Attack()
 void AMainPlayer::MyJump()
 {
 	Super::Jump();
-	bIsJumping = true;
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "void AMainPlayer::MyJump()");
+
+	if (true == bIsSiuuuuAttacking)
+	{
+		bIsJumping = false; // Siuuuu중일 땐, 점프하면 안 됩니닷.
+	}
+	else
+	{
+		bIsJumping = true;
+	}
 }
 
 void AMainPlayer::Landed(const FHitResult& Hit)
@@ -216,6 +232,22 @@ void AMainPlayer::Landed(const FHitResult& Hit)
 		bIsJumping = false;
 	}
 	
+}
+
+void AMainPlayer::QAttack()
+{
+	if (false == bIsQAttacking && false == bIsJumping && false == bIsAttacking && false == bIsSiuuuuAttacking)
+	{
+		bIsQAttacking = true;
+	}
+}
+
+void AMainPlayer::EAttack()
+{
+	if (false == bIsSiuuuuAttacking && false == bIsJumping && false == bIsAttacking && false == bIsQAttacking)
+	{
+		bIsSiuuuuAttacking = true;
+	}
 }
 
 void AMainPlayer::DebugCurrentState()
@@ -249,7 +281,19 @@ FVector AMainPlayer::GetCameraWorldLocation()
 	return CameraWorldPos;
 }
 
+void AMainPlayer::PlayNormalAttackMontage()
+{
+	UMainPlayerAnimInstance* animInst = Cast<UMainPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+
+	animInst->Montage_Play(AttackMontage, 1.f);
+	animInst->Montage_JumpToSection(FName(*FString::Printf(TEXT("PoleAttack%d"), AttackAnimNum)), AttackMontage);
+	if (AttackAnimNum >= 3)
+		AttackAnimNum = 0;
+	else
+		AttackAnimNum += 1;
+}
+
 void AMainPlayer::OnMontageEndedCallback(UAnimMontage* Montage, bool bInterrupted)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, TEXT("AMainPlayer::OnMontageEndedCallback()"));
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Orange, TEXT("AMainPlayer::OnMontageEndedCallback()"));
 }

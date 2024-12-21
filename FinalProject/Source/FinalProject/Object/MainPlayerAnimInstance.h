@@ -70,6 +70,15 @@ public:
 	UFUNCTION()
 	void AnimNotify_EndSiuuuuAttack();
 
+	UFUNCTION()
+	void AnimNotify_FinishAttack0();
+	UFUNCTION()
+	void AnimNotify_FinishAttack1();
+	UFUNCTION()
+	void AnimNotify_FinishAttack2();
+	UFUNCTION()
+	void AnimNotify_FinishAttack3();
+
 public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

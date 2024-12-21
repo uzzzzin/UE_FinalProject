@@ -128,9 +128,9 @@ void UMainPlayerAnimInstance::AddMoveVertical(float _v)
 void UMainPlayerAnimInstance::AnimNotify_EndMoveAttack()
 {
 	// 점프 끝내는 Notify에 들어왔으면 점프를 끝내야죠.
-	if (true == Cast<AMainPlayer>(TryGetPawnOwner())->GetIsAttacking()) // 점프중이에요.
+	if (true == Cast<AMainPlayer>(TryGetPawnOwner())->GetIsQAttacking()) // 점프중이에요.
 	{
-		Cast<AMainPlayer>(TryGetPawnOwner())->SetIsAttacking(false);
+		Cast<AMainPlayer>(TryGetPawnOwner())->SetIsQAttacking(false);
 	}
 }
 
@@ -142,5 +142,69 @@ void UMainPlayerAnimInstance::AnimNotify_EndSiuuuuAttack()
 	if (true == Cast<AMainPlayer>(TryGetPawnOwner())->GetIsSiuuuuAttacking()) // SiuuuuAttack중이에요.
 	{
 		Cast<AMainPlayer>(TryGetPawnOwner())->SetIsSiuuuuAttacking(false);
+	}
+}
+
+void UMainPlayerAnimInstance::AnimNotify_FinishAttack0()
+{
+	AMainPlayer* owner = Cast<AMainPlayer>(TryGetPawnOwner());
+	UStateMachineComponent* SM = owner->FindComponentByClass<UStateMachineComponent>();
+
+	if (nullptr != SM)
+	{
+		owner->SetIsAttacking(false);
+		//SM->GetCurFSM()->ChangeState(FName("PostNormalAttac"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "No StateMachineComponent found in Owner Actor!");
+	}
+}
+
+void UMainPlayerAnimInstance::AnimNotify_FinishAttack1()
+{
+	AMainPlayer* owner = Cast<AMainPlayer>(TryGetPawnOwner());
+	UStateMachineComponent* SM = owner->FindComponentByClass<UStateMachineComponent>();
+
+	if (nullptr != SM)
+	{
+		owner->SetIsAttacking(false);
+		//SM->GetCurFSM()->ChangeState(FName("PostNormalAttac"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "No StateMachineComponent found in Owner Actor!");
+	}
+}
+
+void UMainPlayerAnimInstance::AnimNotify_FinishAttack2()
+{
+	AMainPlayer* owner = Cast<AMainPlayer>(TryGetPawnOwner());
+	UStateMachineComponent* SM = owner->FindComponentByClass<UStateMachineComponent>();
+
+	if (nullptr != SM)
+	{
+		owner->SetIsAttacking(false);
+		//SM->GetCurFSM()->ChangeState(FName("PostNormalAttac"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "No StateMachineComponent found in Owner Actor!");
+	}
+}
+
+void UMainPlayerAnimInstance::AnimNotify_FinishAttack3()
+{
+	AMainPlayer* owner = Cast<AMainPlayer>(TryGetPawnOwner());
+	UStateMachineComponent* SM = owner->FindComponentByClass<UStateMachineComponent>();
+
+	if (nullptr != SM)
+	{
+		owner->SetIsAttacking(false);
+		//SM->GetCurFSM()->ChangeState(FName("PostNormalAttac"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "No StateMachineComponent found in Owner Actor!");
 	}
 }

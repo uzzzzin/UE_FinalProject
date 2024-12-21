@@ -37,10 +37,17 @@ public:
 
 	bool firstClick; // 언리얼 에디터에서 인게임 첫 클릭시에도 공격으로 인정되기 때문에 마우스 포커싱 후 첫 클릭을 유효 첫클릭으로 하기 위한 체크용 변수
 
+	UPROPERTY(BlueprintReadOnly) // 애니메이션 몽타주 NormalAttack용.
+	UAnimMontage* AttackMontage; // 테스트 끝나고 애님 인스턴스로 이동.
+
+	int AttackAnimNum; // Attack Montage Animation Number : 0~3
+
 public: // for StateMachine
 	bool bIsJumping; // Jump 관련 State에서 사용하는 Jump 상태 변수
 	bool bIsAttacking; // Attack 관련 State에서 사용하는 Attack 상태 변수
-	bool bIsSiuuuuAttacking; // Jump중일 떄 Attack 은 킹갓Siuuuu Attack
+	bool bIsSiuuuuAttacking; // 킹갓Siuuuu Attack
+	bool bIsQAttacking;
+
 
 public:
 	bool GetIsJumping() { return bIsJumping; }
@@ -50,6 +57,9 @@ public:
 
 	bool GetIsSiuuuuAttacking() { return bIsSiuuuuAttacking; }
 	void SetIsSiuuuuAttacking(bool _b) { bIsSiuuuuAttacking = _b; }
+
+	bool GetIsQAttacking() { return bIsQAttacking; }
+	void SetIsQAttacking(bool _b) { bIsQAttacking = _b; }
 
 public:
 	void MoveVertical(float _v); // 플레이어의 이동 함수들
@@ -61,6 +71,9 @@ public:
 	void Attack(); // attack 키 눌렀을 때 동작하는 함수
 	void MyJump(); // jump 키 눌렀을 때 동작하는 함수
 	virtual void Landed(const FHitResult& Hit) override; // Landed() Override
+
+	void QAttack(); // Q 키 눌렀을 떄 동작하는 함수
+	void EAttack(); // E 키 눌렀을 떄 동작하는 함수
 
 	void DebugCurrentState(); // O키를 눌렀을 때, 현재 State를 알기 위한 디버깅용 함수
 
@@ -74,6 +87,8 @@ public:
 
 	//! SpringArm에 부착된 Camera의 WorldPos 구하는 함수.
 	FVector GetCameraWorldLocation();
+
+	void PlayNormalAttackMontage(); // MainPlayer용 공격Montage 관련 Play 함수
 
 public:
 	UFUNCTION() // Montage가 끝났을 떄 실행되는 델리게이트 콜백 함수.

@@ -26,7 +26,7 @@ void UReMainPlayerPostSiuuuAttackState::Update(float DeltaTime)
 
 	if (accTime > duration) // Delay 시간이 끝나면
 	{
-		owner->GetCharacterMovement()->SetMovementMode(MOVE_Walking); // 플레이어 이동을 다시 활성화해요.
+		//owner->GetCharacterMovement()->SetMovementMode(MOVE_Walking); // 플레이어 이동을 다시 활성화해요.
 
 		// PostSiuuuuAttack -> Idle
 		if (0 >= owner->GetVelocity().Size())
@@ -44,7 +44,7 @@ void UReMainPlayerPostSiuuuAttackState::Update(float DeltaTime)
 	else // 아직 현재 상태를 유지해야 해요.
 	{
 		accTime += DeltaTime;
-		owner->GetCharacterMovement()->DisableMovement(); // 플레이어 이동을 비활성화 했어요.
+		//owner->GetCharacterMovement()->DisableMovement(); // 플레이어 이동을 비활성화 했어요.
 	}
 }
 

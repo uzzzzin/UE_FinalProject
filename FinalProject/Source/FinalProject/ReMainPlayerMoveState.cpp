@@ -27,12 +27,27 @@ void UReMainPlayerMoveState::Update(float DeltaTime)
 		return;
 	}
 
-	// Move -> MoveAttack
-	if (true == owner->GetIsAttacking())
+	// Move -> SiuuuuAttack
+	if (true == owner->GetIsSiuuuuAttacking())
+	{
+		GetOwnerFSM()->ChangeState(FName("SiuuuuAttack"));
+		return;
+	}
+
+	// Move -> MoveAttackQ
+	if (true == owner->GetIsQAttacking())
 	{
 		GetOwnerFSM()->ChangeState(FName("MoveAttack"));
 		return;
 	}
+
+	// Move -> NormalAttack
+	if (true == owner->GetIsAttacking())
+	{
+		GetOwnerFSM()->ChangeState(FName("NormalAttack"));
+		return;
+	}
+
 }
 
 void UReMainPlayerMoveState::Exit()

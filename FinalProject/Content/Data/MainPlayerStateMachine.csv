@@ -6,3 +6,5 @@ key,FSM,State
 4,MainPlayer,PostMoveAttack
 5,MainPlayer,SiuuuuAttack
 6,MainPlayer,PostSiuuuAttack
+7,MainPlayer,NormalAttack
+8,MainPlayer,PostNormalAttac

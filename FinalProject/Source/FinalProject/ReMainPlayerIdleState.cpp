@@ -23,6 +23,25 @@ void UReMainPlayerIdleState::Update(float DeltaTime)
 		GetOwnerFSM()->ChangeState(FName("Move"));
 		return;
 	}
+
+	if (true == owner->GetIsQAttacking())
+	{
+		GetOwnerFSM()->ChangeState(FName("MoveAttack"));
+		return;
+	}
+
+	if (true == owner->GetIsSiuuuuAttacking())
+	{
+		GetOwnerFSM()->ChangeState(FName("SiuuuuAttack"));
+		return;
+	}
+
+	if (true == owner->GetIsAttacking())
+	{
+		GetOwnerFSM()->ChangeState(FName("NormalAttack"));
+		return;
+	}
+
 }
 
 void UReMainPlayerIdleState::Exit()

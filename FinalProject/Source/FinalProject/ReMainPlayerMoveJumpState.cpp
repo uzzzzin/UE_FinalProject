@@ -35,15 +35,6 @@ void UReMainPlayerMoveJumpState::Update(float DeltaTime)
 			return;
 		}
 	}
-	else // 현재 아직 Jump중이에요. 
-	{
-		if (true == owner->GetIsSiuuuuAttacking())
-		{
-			// MoveJump -> SiuuuuAttack
-			GetOwnerFSM()->ChangeState(FName("SiuuuuAttack"));
-			return;
-		}
-	}
 }
 
 void UReMainPlayerMoveJumpState::Exit()
