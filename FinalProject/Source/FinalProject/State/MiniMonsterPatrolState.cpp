@@ -9,7 +9,7 @@
 #include "../Object/MiniMonster/MiniMonsterAIController.h"
 
 UMiniMonsterPatrolState::UMiniMonsterPatrolState()
-	: speed(100.f)
+	: speed(200.f)
 	, rotSpeed(3.f)
 {
 }
@@ -20,11 +20,20 @@ void UMiniMonsterPatrolState::Enter_Implementation()
 	AMiniMonsterAIController* AI = Cast<AMiniMonsterAIController>(owner->GetController());
 
 	//GetWorld()->GetTimerManager().SetTimer(repeatTimer, AI, &AMiniMonsterAIController::SetRandomPatrolLocation,3.f,true);
+
+	speed += FMath::RandRange(-20.f, 30.f); // 랜덤한 스피드 값을 더해줘요.
 }
 
 void UMiniMonsterPatrolState::Update_Implementation(float DeltaTime)
 {
-	//AMiniMonster* owner = Cast<AMiniMonster>(GetOwnerFSM()->GetOwnerStateMachine()->GetOwner());
+	// Trace Trigger까지 걸어가요
+	// TraceTrigger에서 ChangeState 예정.
+	AMiniMonster* owner = Cast<AMiniMonster>(GetOwnerFSM()->GetOwnerStateMachine()->GetOwner());
+	FVector newPos = owner->GetActorLocation() + -owner->GetActorForwardVector() * speed * DeltaTime;
+	owner->SetActorLocation(newPos);
+
+	if (1600.f != owner->GetActorLocation().Z) // 땅에서 붕뜨는 현상을 막기 위한 예외처리.
+		owner->SetActorLocation(FVector(owner->GetActorLocation().X, owner->GetActorLocation().Y, 1600.f));
 	//AMiniMonsterAIController* AI = Cast<AMiniMonsterAIController>(owner->GetController());
 	//
 	//if (nullptr == AI) // AI가 아직 없어요?
@@ -57,10 +66,10 @@ void UMiniMonsterPatrolState::Update_Implementation(float DeltaTime)
 	//		}
 	//	}
 	//}
-
 }
 
 void UMiniMonsterPatrolState::Exit_Implementation()
 {
 	//GetWorld()->GetTimerManager().ClearTimer(repeatTimer);
+	speed = 200.f;
 }

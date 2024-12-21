@@ -9,6 +9,7 @@
 
 AMiniMonsterSpawnTrigger::AMiniMonsterSpawnTrigger()
 	: spawnCount(30)
+    , onceSpawn(false)
 {
  	PrimaryActorTick.bCanEverTick = true;
 
@@ -45,44 +46,51 @@ void AMiniMonsterSpawnTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, "AMiniMonsterSpawnTrigger::OnOverlapBegin()");
 
-    int curSpawnCount = 0;
-
-    while (curSpawnCount <= spawnCount)
+    if (true == onceSpawn) // 스폰은 오로지 한번만 하기로 해요.
+        return;
+    else
     {
-        FVector spawnPos;
-        FRotator spawnRot;
-        int randomNum = FMath::RandRange(0, 1); // 0이면 L, 1이면 R
+        int curSpawnCount = 0;
 
-        if (0 == randomNum)
+        while (curSpawnCount <= spawnCount)
         {
-            spawnPos = FVector(20200.f, 2550.f, 1600.f);
-            spawnRot = FRotator(0, -90, 0.f);
-        }
-        else
-        {
-            spawnPos = FVector(19740.f, 7830.f, 1600.f);
-            spawnRot = FRotator(0, 90, 0.f);
+            FVector spawnPos;
+            FRotator spawnRot;
+            int randomNum = FMath::RandRange(0, 1); // 0이면 L, 1이면 R
+
+            if (0 == randomNum)
+            {
+                spawnPos = FVector(20200.f, 3000.f, 1600.f);
+                spawnRot = FRotator(0, -90, 0.f);
+            }
+            else
+            {
+                spawnPos = FVector(19740.f, 7330.f, 1600.f);
+                spawnRot = FRotator(0, 90, 0.f);
+            }
+
+            // 스폰 위치 및 회전: 트리거 액터의 위치와 회전을 기준으로 설정
+            FVector randPos = FVector(FMath::FRandRange(-500.f, 500.f), FMath::FRandRange(-500.f, 500.f), 0.f);
+            FVector SpawnLocation = spawnPos + randPos; // 배열 크기에 따라 Y축 오프셋
+            FRotator SpawnRotation = GetActorRotation() + spawnRot;
+
+            // Pawn 스폰
+            AMiniMonster* miniMonster = GetWorld()->SpawnActor<AMiniMonster>(AMiniMonster::StaticClass(), SpawnLocation, SpawnRotation);
+
+            if (miniMonster)
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("Pawn spawned successfully at %s."), *SpawnLocation.ToString()));
+                spawnedArr.Add(miniMonster); // 배열에 추가
+            }
+            else
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "Failed to spawn Pawn.");
+            }
+
+            ++curSpawnCount;
         }
 
-        // 스폰 위치 및 회전: 트리거 액터의 위치와 회전을 기준으로 설정
-        FVector randPos = FVector(FMath::FRandRange(-500.f, 500.f), FMath::FRandRange(-500.f, 500.f), 0.f);
-        FVector SpawnLocation = spawnPos + randPos; // 배열 크기에 따라 Y축 오프셋
-        FRotator SpawnRotation = GetActorRotation() + spawnRot;
-
-        // Pawn 스폰
-        AMiniMonster* miniMonster = GetWorld()->SpawnActor<AMiniMonster>(AMiniMonster::StaticClass(), SpawnLocation, SpawnRotation);
-
-        if (miniMonster)
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, FString::Printf(TEXT("Pawn spawned successfully at %s."), *SpawnLocation.ToString()));
-            spawnedArr.Add(miniMonster); // 배열에 추가
-        }
-        else
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "Failed to spawn Pawn.");
-        }
-
-        ++curSpawnCount;
+        onceSpawn = true;
     }
 
 }
