@@ -21,6 +21,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StateMachine")
 	class UStateMachineComponent* SM;
 
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	//TSubclassOf<class UMiniMonsterUserWidget> WidgetClass; // 블루프린트에서 설정할 위젯 클래스
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "UI")
+	//UMiniMonsterUserWidget* WidgetInstance; // 생성된 위젯 인스턴스
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UWidgetComponent* widgetCom;
+
 public:
 	void SetRandomMaterial(); // 랜덤으로 머터리얼을 배정할 거예요.
 

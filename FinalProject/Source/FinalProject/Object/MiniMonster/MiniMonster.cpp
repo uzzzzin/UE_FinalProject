@@ -5,6 +5,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "../../Component/StateMachineComponent.h"
 #include "MiniMonsterAIController.h"
+#include "Components/WidgetComponent.h"
+#include "../../MiniMonsterUserWidget.h"
 
 // Sets default values
 AMiniMonster::AMiniMonster()
@@ -39,7 +41,27 @@ AMiniMonster::AMiniMonster()
 	//! State Machine 설정
 	SM = CreateDefaultSubobject<UStateMachineComponent>(TEXT("SM"));
 	SM->SetFSMDataPath(TEXT("/Script/Engine.DataTable'/Game/Data/MiniMonsterStateMachine.MiniMonsterStateMachine'"));
+	
 
+	//! UserWidgetClass를 블루프린트 경로에서 로드
+	//if (WidgetBPClass.Class != nullptr)
+	//{
+	//	WidgetClass = WidgetBPClass.Class;
+	//}
+
+	//! User Widget
+	widgetCom = CreateDefaultSubobject<UWidgetComponent>(TEXT("widget"));
+	static ConstructorHelpers::FClassFinder<UMiniMonsterUserWidget> widget(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Monster/BP_MiniMonsterUI.BP_MiniMonsterUI_C'"));
+	if (widget.Succeeded())
+	{
+		widgetCom->SetWidgetClass(widget.Class);
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Magenta, "true");
+	}
+	widgetCom->SetupAttachment(GetCapsuleComponent());
+	widgetCom->SetWidgetSpace(EWidgetSpace::World);
+	widgetCom->SetRelativeLocation(FVector(0.f, 0.f, 6.f));
+	widgetCom->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
+	widgetCom->SetTwoSided(true);
 }
 
 void AMiniMonster::SetRandomMaterial()
@@ -95,6 +117,20 @@ void AMiniMonster::BeginPlay()
 	
 	wolfStyle = FMath::RandRange(0, 2);
 	SetRandomMaterial();
+
+	////! Widget 세팅
+	//if (WidgetClass)
+	//{
+	//	WidgetInstance = CreateWidget<UMiniMonsterUserWidget>(GetWorld(), WidgetClass);
+	//	if (WidgetInstance)
+	//	{
+	//		WidgetInstance->AddToViewport();
+	//	}
+	//}
+	//else
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, "Widget Class Is not Set....");
+	//}
 }
 
 void AMiniMonster::Tick(float DeltaTime)

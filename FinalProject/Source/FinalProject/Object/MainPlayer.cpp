@@ -63,7 +63,6 @@ AMainPlayer::AMainPlayer()
 	}
 
 	//! UserWidgetClass를 블루프린트 경로에서 로드
-		// 위젯 클래스 설정
 	static ConstructorHelpers::FClassFinder<UMainPlayerUserWidget> WidgetBPClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/BP_MainPlayerUI.BP_MainPlayerUI_C'"));
 	if (WidgetBPClass.Class != nullptr)
 	{
